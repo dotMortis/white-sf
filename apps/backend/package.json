@@ -28,14 +28,19 @@
         "prod:pm2": "node ./node_modules/pm2/bin/pm2 start ecosystem.config.js --env production"
     },
     "dependencies": {
+        "@bits_devel/logger": "^5.1.1",
         "@bits_devel/process-handler": "^1",
         "@internal/shared": "workspace:^",
-        "pm2": "^5"
+        "express": "^4.21.0",
+        "pm2": "^5",
+        "ws": "^8.18.0"
     },
     "devDependencies": {
         "@bits_devel/eslint-config-bits": "latest",
         "@bits_devel/tsconfig": "latest",
+        "@types/express": "^4.17.21",
         "@types/node": "^20",
+        "@types/ws": "^8.5.12",
         "@vitest/coverage-v8": "^2",
         "nodemon": "^3",
         "prettier": "^3",
