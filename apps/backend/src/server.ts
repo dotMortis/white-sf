@@ -68,8 +68,9 @@ export class WebServer {
                 if (pathname === '/whitefs') {
                     socket.on('message', data => {
                         const dataStr = String(data);
-                        console.log('GOT DATA', dataStr);
-                        socket.send('ACK');
+                        if (dataStr === 'ping') {
+                            socket.send('pong');
+                        }
                     });
                 }
             });
