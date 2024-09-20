@@ -1,0 +1,7 @@
+{
+    "extends": "./node_modules/@bits_devel/tsconfig/esm.json",
+    "compilerOptions": {
+        "declaration": false,
+        "outDir": "./dist"
+    }
+}

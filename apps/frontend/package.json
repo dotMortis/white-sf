@@ -1,5 +1,5 @@
 {
-    "name": "{{app-name}}",
+    "name": "frontend",
     "version": "0.0.0",
     "type": "module",
     "main": "./dist/src/index.js",
@@ -26,16 +26,23 @@
         "gitprune": "git config fetch.prune true && git config fetch.pruneTags true && git fetch",
         "depcheck": "depcheck"
     },
-    "dependencies": {},
+    "dependencies": {
+        "@internal/shared": "workspace:^"
+    },
     "devDependencies": {
         "@bits_devel/eslint-config-bits": "latest",
         "@bits_devel/tsconfig": "latest",
         "@types/node": "^20",
+        "@vitest/coverage-v8": "^2",
         "nodemon": "^3",
         "prettier": "^3",
         "ts-node": "^10",
         "typescript": "^5",
-        "@vitest/coverage-v8": "^2",
+        "vite": "^5.4.7",
         "vitest": "^2"
-    }
+    },
+    "files": [
+        "./README.md",
+        "./dist"
+    ]
 }

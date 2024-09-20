@@ -1,5 +1,5 @@
 {
-    "name": "{{app-name}}",
+    "name": "backend",
     "version": "0.0.0",
     "type": "module",
     "main": "./dist/src/index.js",
@@ -24,18 +24,28 @@
         "preversion": "pnpm run gitprune",
         "postversion": "git push --tags && git push && echo \"Successfully released version $npm_package_version!\"",
         "gitprune": "git config fetch.prune true && git config fetch.pruneTags true && git fetch",
-        "depcheck": "depcheck"
+        "depcheck": "depcheck",
+        "prod:pm2": "node ./node_modules/pm2/bin/pm2 start ecosystem.config.js --env production"
     },
-    "dependencies": {},
+    "dependencies": {
+        "@bits_devel/process-handler": "^1",
+        "@internal/shared": "workspace:^",
+        "pm2": "^5"
+    },
     "devDependencies": {
         "@bits_devel/eslint-config-bits": "latest",
         "@bits_devel/tsconfig": "latest",
         "@types/node": "^20",
+        "@vitest/coverage-v8": "^2",
         "nodemon": "^3",
         "prettier": "^3",
         "ts-node": "^10",
         "typescript": "^5",
-        "@vitest/coverage-v8": "^2",
         "vitest": "^2"
-    }
+    },
+    "files": [
+        "./README.md",
+        "./dist",
+        "./ecosystem.config.js"
+    ]
 }

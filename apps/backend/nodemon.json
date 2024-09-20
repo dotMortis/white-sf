@@ -1,0 +1,9 @@
+{
+    "watch": ["./src/**", "./node_modules/@internal/**/dist/**"],
+    "ext": "ts,tsx,js,mjs,css",
+    "execMap": {
+        "ts": "node --loader ts-node/esm"
+    },
+    "ignore": ["src/**/*.spec.ts"],
+    "ignoreRoot": []
+}
