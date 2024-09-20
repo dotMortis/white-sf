@@ -7,7 +7,7 @@ const start = () => {
     const ph = processHandler();
     ph.onStart(async () => {
         console.log('STARTING SERVER');
-        server = new WebServer();
+        server = new WebServer('localhost', 3000);
         server.init();
         await server.start();
         console.log('STARTED SERVER');
