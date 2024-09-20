@@ -1,0 +1,4 @@
+{
+    "extends": "./node_modules/@bits_devel/tsconfig/esm.json",
+    "include": ["./bin/**/*"]
+}

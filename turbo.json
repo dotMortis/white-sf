@@ -1,0 +1,37 @@
+{
+    "$schema": "https://turbo.build/schema.json",
+    "globalDependencies": ["**/.env.*local"],
+    "ui": "stream",
+    "tasks": {
+        "build": {
+            "dependsOn": ["^build"],
+            "outputs": [".dist/**"],
+            "cache": true
+        },
+        "build:dev": {
+            "dependsOn": ["^build"],
+            "outputs": [".dist/**"],
+            "cache": true
+        },
+        "dev": {
+            "persistent": true,
+            "cache": false
+        },
+        "typecheck": {
+            "dependsOn": ["topo"]
+        },
+        "typecheck:watch": {
+            "persistent": true,
+            "cache": false
+        },
+        "test": {
+            "cache": false
+        },
+        "test:watch": {
+            "cache": false
+        },
+        "topo": {
+            "dependsOn": ["^topo"]
+        }
+    }
+}

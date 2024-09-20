@@ -1,0 +1,59 @@
+{
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "eslint.workingDirectories": [
+        {
+            "mode": "auto"
+        }
+    ],
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit",
+        "source.organizeImports": "explicit"
+    },
+    "typescript.inlayHints.parameterNames.enabled": "all",
+    "editor.suggest.showFolders": true,
+    "material-icon-theme.folders.associations": {
+        "public-packages": "global",
+        "public-package": "global",
+        "vite": "controller"
+    },
+    "material-icon-theme.files.associations": {
+        "*.generator.ts": "turborepo",
+        "*.action.ts": "turborepo",
+        "*.route.ts": "routing",
+        "*.route.tsx": "routing",
+        "tsconfig.settings.json": "tsconfig",
+        "*.vite.config.ts": "Vite"
+    },
+
+    "[prisma]": {
+        "editor.defaultFormatter": "Prisma.prisma"
+    },
+    "[sql]": {
+        "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
+    },
+    "workbench.colorCustomizations": {
+        "activityBar.activeBackground": "#b19ae4",
+        "activityBar.background": "#b19ae4",
+        "activityBar.foreground": "#15202b",
+        "activityBar.inactiveForeground": "#15202b99",
+        "activityBarBadge.background": "#b0572f",
+        "activityBarBadge.foreground": "#e7e7e7",
+        "commandCenter.border": "#15202b99",
+        "sash.hoverBorder": "#b19ae4",
+        "statusBar.background": "#9272d9",
+        "statusBar.foreground": "#15202b",
+        "statusBarItem.hoverBackground": "#734ace",
+        "statusBarItem.remoteBackground": "#9272d9",
+        "statusBarItem.remoteForeground": "#15202b",
+        "titleBar.activeBackground": "#9272d9",
+        "titleBar.activeForeground": "#15202b",
+        "titleBar.inactiveBackground": "#9272d999",
+        "titleBar.inactiveForeground": "#15202b99"
+    },
+    "peacock.remoteColor": "#9272d9",
+    "files.associations": {
+        ".env.json": "json",
+        "*.ndjson": "json"
+    }
+}

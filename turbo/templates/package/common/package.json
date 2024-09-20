@@ -1,0 +1,35 @@
+{
+    "version": "0.0.0",
+    "type": "module",
+    "license": "UNLICENSED",
+    "scripts": {
+        "build": "rm -rf dist/ && tsc -p ./tsconfig.build.json",
+        "build:watch": "pnpm build --watch",
+        "typecheck": "tsc -p ./tsconfig.build.json --noEmit",
+        "typecheck:watch": "pnpm typecheck --watch",
+        "lint": "eslint . --fix",
+        "test": "vitest",
+        "test:coverage": "pnpm test -- --coverage",
+        "test:watch": "pnpm test -- --watch",
+        "depcheck": "depcheck"
+    },
+    "devDependencies": {
+        "@bits_devel/eslint-config-bits": "latest",
+        "@bits_devel/tsconfig": "latest",
+        "@types/node": "^20",
+        "ts-node": "latest",
+        "prettier": "^3",
+        "typescript": "^5",
+        "@vitest/coverage-v8": "^2",
+        "vitest": "^2"
+    },
+    "dependencies": {
+    },
+    "files": [
+        "./dist",
+        "./README.md"
+    ],
+    "exports": {
+        "./package.json": "./package.json"
+    }
+}

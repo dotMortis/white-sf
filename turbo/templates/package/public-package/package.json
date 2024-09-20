@@ -1,0 +1,17 @@
+{
+    "name": "@bits_devel/{{name}}",
+    "scripts": {
+        "prepublishOnly": "pnpm run build",
+        "preversion": "pnpm run gitprune",
+        "postversion": "git push --tags && git push && echo \"Successfully released version $npm_package_version!\"",
+        "livepatch": "pnpm version patch",
+        "liveminor": "pnpm version minor",
+        "livemajor": "pnpm version major",
+        "prerelease": "pnpm version prerelease --preid=rc",
+        "prepatch": "pnpm version prepatch --preid=rc",
+        "preminor": "pnpm version preminor --preid=rc",
+        "premajor": "pnpm version premajor --preid=rc",
+        "gitprune": "git config fetch.prune true && git config fetch.pruneTags true && git fetch"
+    },
+    "devDependencies": {}
+}

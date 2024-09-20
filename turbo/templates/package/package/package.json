@@ -1,0 +1,7 @@
+{
+    "name": "@internal/{{name}}",
+    "private": true,
+    "scripts": {
+        "prebuild": "node ../../bin/export-definer.mjs"
+    }
+}

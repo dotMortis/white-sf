@@ -1,0 +1,15 @@
+{
+    "scripts": {
+        "prod:pm2": "node ./node_modules/pm2/bin/pm2 start ecosystem.config.js --env production"
+    },
+    "dependencies": {
+        "@bits_devel/process-handler": "^1",
+        "pm2": "^5"
+    },
+    "devDependencies": {},
+    "files": [
+        "./README.md",
+        "./dist",
+        "./ecosystem.config.js"
+    ]
+}

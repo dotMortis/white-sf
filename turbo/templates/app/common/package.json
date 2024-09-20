@@ -1,0 +1,42 @@
+{
+    "name": "{{app-name}}",
+    "version": "0.0.0",
+    "type": "module",
+    "main": "./dist/src/index.js",
+    "private": true,
+    "scripts": {
+        "dev": "nodemon -q ./src/index.ts",
+        "prod": "NODE_ENV=production node ./dist/src/index.js",
+        "build": "rm -rf ./dist && tsc -p ./tsconfig.build.json",
+        "lint": "eslint . --fix",
+        "typecheck": "tsc -p ./tsconfig.build.json --noEmit",
+        "typecheck:watch": "pnpm typecheck --watch",
+        "test": "vitest",
+        "test:coverage": "pnpm test -- --coverage",
+        "test:watch": "pnpm test -- --watch",
+        "livepatch": "pnpm version patch",
+        "liveminor": "pnpm version minor",
+        "livemajor": "pnpm version major",
+        "prerelease": "pnpm version prerelease --preid=rc",
+        "prepatch": "pnpm version prepatch --preid=rc",
+        "preminor": "pnpm version preminor --preid=rc",
+        "premajor": "pnpm version premajor --preid=rc",
+        "preversion": "pnpm run gitprune",
+        "postversion": "git push --tags && git push && echo \"Successfully released version $npm_package_version!\"",
+        "gitprune": "git config fetch.prune true && git config fetch.pruneTags true && git fetch",
+        "depcheck": "depcheck"
+    },
+    "dependencies": {
+    },
+    "devDependencies": {
+        "@bits_devel/eslint-config-bits": "latest",
+        "@bits_devel/tsconfig": "latest",
+        "@types/node": "^20",
+        "nodemon": "^3",
+        "prettier": "^3",
+        "ts-node": "^20",
+        "typescript": "^5",
+        "@vitest/coverage-v8": "^2",
+        "vitest": "^2"
+    }
+}
