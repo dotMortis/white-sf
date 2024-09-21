@@ -10,7 +10,7 @@ import { Vote } from './vote/vote.js';
 
 export type PlayerName = 'BANK' | 'LOOSER';
 
-export type Action = 'DRAW' | 'PASS' | 'RESULT' | 'VOTING' | 'CANCEL' | 'COIN';
+export type Action = 'DRAW' | 'PASS' | 'RESULT' | 'VOTING' | 'CANCEL' | 'COIN' | 'WAITING';
 
 export type CoinDecision = 'DRAW' | 'PASS' | 'PENDING';
 
@@ -66,11 +66,21 @@ export type TheGameStateResult = {
     ts: string;
 };
 
+export type TheGameStateWaiting = {
+    action: Extract<Action, 'WAITING'>;
+    data: {
+        min: number;
+        current: number;
+    };
+    ts: string;
+};
+
 export type TheGameState =
     | TheGameStateDefault
     | TheGameStateCoin
     | TheGameStateVoting
-    | TheGameStateResult;
+    | TheGameStateResult
+    | TheGameStateWaiting;
 
 export type TheGameStatus = 'WAITING_FOR_PLAYERS' | 'RUNNING' | 'ENDING';
 export type BankStatus = 'LOST' | 'WON' | 'DRAW' | 'EVEN' | 'PASS';
@@ -172,8 +182,15 @@ export class TheGame {
         this._bank.resetHand();
         this._looser.addCard(this._cardDeck.draw());
         this._bank.addCard(this._cardDeck.draw());
-        this._setCurrentStatus('STARTING');
         const interval = setInterval(() => {
+            this._emitUpdate({
+                action: 'WAITING',
+                data: {
+                    current: this._activePlayers,
+                    min: TheGame.MIN_PLAYERS
+                },
+                ts: new Date().toISOString()
+            });
             if (this._start()) {
                 clearInterval(interval);
             }
@@ -207,10 +224,10 @@ export class TheGame {
         this._eventEmitter.emit('update', data);
     }
 
-    private _setCurrentStatus(data: TheGameState | 'STARTING'): void {
-        if (data === 'STARTING') {
+    private _setCurrentStatus(data: TheGameState): void {
+        if (data.action === 'WAITING') {
             this._currentStatus = {
-                data: this.data,
+                data: data.data,
                 humanStatus: 'DRAW',
                 bankStatus: 'DRAW',
                 gameStatus: 'WAITING_FOR_PLAYERS'
