@@ -17,6 +17,7 @@ export type TheGameStateCoin = {
     data: {
         decision: 'DRAW' | 'PASS';
     };
+    ts: string;
 };
 
 export type TheGameData = {
@@ -33,6 +34,7 @@ export type TheGameData = {
         current: Vote;
         past: ReadonlyArray<Vote>;
     };
+    ts: string;
 };
 
 export type TheGameStateVoiting = {
@@ -44,17 +46,20 @@ export type TheGameStateVoiting = {
             past: ReadonlyArray<Vote>;
         };
     };
+    ts: string;
 };
 
 export type TheGameStateDefault = {
     action: Extract<Action, 'PASS' | 'DRAW' | 'CANCEL'>;
     player: PlayerName;
     data: TheGameData;
+    ts: string;
 };
 
 export type TheGameStateResult = {
     action: Extract<Action, 'RESULT'>;
     data: TheGameData;
+    ts: string;
 };
 
 export type TheGameState =
@@ -102,7 +107,8 @@ export class TheGame {
             votings: {
                 current: this._voteMaschine.state.vote,
                 past: this._voteStack
-            }
+            },
+            ts: new Date().toISOString()
         };
     }
 
@@ -172,7 +178,8 @@ export class TheGame {
                         current: vote.vote,
                         past: this._voteStack
                     }
-                }
+                },
+                ts: new Date().toISOString()
             });
         }
     }
@@ -195,7 +202,8 @@ export class TheGame {
                 this._emitUpdate({
                     action: 'DRAW',
                     player: player.name,
-                    data: this.data
+                    data: this.data,
+                    ts: new Date().toISOString()
                 });
                 this._runNextStep('DRAW', player);
             }, TheGame.TICK_INTERNVAL);
@@ -204,7 +212,8 @@ export class TheGame {
                 this._emitUpdate({
                     action: 'PASS',
                     player: player.name,
-                    data: this.data
+                    data: this.data,
+                    ts: new Date().toISOString()
                 });
                 this._runNextStep('DRAW', player);
             }, TheGame.TICK_INTERNVAL);
@@ -217,7 +226,8 @@ export class TheGame {
                     player: 'LOOSER',
                     data: {
                         decision
-                    }
+                    },
+                    ts: new Date().toISOString()
                 });
                 if (decision === 'DRAW') {
                     this._playerDraw(this._looser);
@@ -229,7 +239,8 @@ export class TheGame {
             setTimeout(() => {
                 this._emitUpdate({
                     action: 'RESULT',
-                    data: this.data
+                    data: this.data,
+                    ts: new Date().toISOString()
                 });
             }, TheGame.TICK_INTERNVAL);
         } else if (from === 'VOTING') {
