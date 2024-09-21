@@ -56,6 +56,7 @@ export class VoteMaschine {
             return;
         }
         ++this._currentVote.draw;
+        this._emitUpdate(this.state);
     }
 
     votePass(): void {
@@ -63,6 +64,7 @@ export class VoteMaschine {
             return;
         }
         ++this._currentVote.pass;
+        this._emitUpdate(this.state);
     }
 
     onUpdate(listener: (voteState: VoteState) => void): void {

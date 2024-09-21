@@ -131,7 +131,7 @@ export class TheGame {
                 break;
             }
             case 'PASS': {
-                this._voteMaschine.voteDraw();
+                this._voteMaschine.votePass();
                 break;
             }
         }

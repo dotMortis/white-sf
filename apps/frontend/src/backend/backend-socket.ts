@@ -10,6 +10,7 @@ export type BackendSocketEvents = {
         playerCards: ReadonlyArray<EncodedCard>,
         playerScore: number
     ) => void;
+    vote: (drawVotes: number, passVotes: number) => void;
 };
 
 export class BackendSocket extends EventEmitter<BackendSocketEvents> {
@@ -17,6 +18,7 @@ export class BackendSocket extends EventEmitter<BackendSocketEvents> {
     private readonly _url: string;
     private _messageListener: ((event: MessageEvent) => void) | null;
     private _closeListener: (() => void) | null;
+    private _lastTimestamp: number;
 
     constructor(url: string) {
         super();
@@ -24,6 +26,7 @@ export class BackendSocket extends EventEmitter<BackendSocketEvents> {
         this._url = url;
         this._messageListener = null;
         this._closeListener = null;
+        this._lastTimestamp = 0;
     }
 
     async connect(): Promise<void> {
@@ -90,6 +93,11 @@ export class BackendSocket extends EventEmitter<BackendSocketEvents> {
     }
 
     private _processEvent(event: TheGameState): void {
+        const timestamp = new Date(event.ts).getTime();
+        if (timestamp < this._lastTimestamp) {
+            return;
+        }
+
         switch (event.action) {
             case 'DRAW':
                 this.emit(
@@ -101,9 +109,14 @@ export class BackendSocket extends EventEmitter<BackendSocketEvents> {
                     event.data.human.points
                 );
                 break;
+            case 'VOTING':
+                this.emit('vote', event.data.votings.current.draw, event.data.votings.current.pass);
+                break;
             default:
                 console.log('UNHANDLED EVENT', event);
                 break;
         }
+
+        this._lastTimestamp = timestamp;
     }
 }

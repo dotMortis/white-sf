@@ -30,12 +30,19 @@ export const App = () => {
             setScores([dealerScore, playerScore]);
             setDealerCards(dealerCards);
             setPlayerCards(playerCards);
+            setVotes(null);
+        };
+
+        const voteListener: EventListener<BackendSocketEvents, 'vote'> = (drawVotes, passVotes) => {
+            setVotes([drawVotes, passVotes]);
         };
 
         backend.on('draw', drawListener);
+        backend.on('vote', voteListener);
 
         return () => {
             backend.remove('draw', drawListener);
+            backend.remove('vote', voteListener);
         };
     }, [backend]);
 
