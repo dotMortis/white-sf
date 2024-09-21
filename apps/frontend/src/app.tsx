@@ -7,7 +7,7 @@ export const App = () => {
     return (
         <main className='app'>
             <PlayingTable />
-            <ScoreDisplay />
+            <ScoreDisplay dealerScore={0} playerScore={0} />
             <VoteChart votes={[4, 6]} categories={['Draw', 'Pass']} />
         </main>
     );
