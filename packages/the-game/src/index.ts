@@ -201,6 +201,7 @@ export class TheGame {
     private _emitUpdate(data: TheGameState): void {
         if (data.action === 'RESULT') {
             this._running = false;
+            this.playerReset();
         }
         this._setCurrentStatus(data);
         this._eventEmitter.emit('update', data);
