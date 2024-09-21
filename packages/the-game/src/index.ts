@@ -37,7 +37,7 @@ export type TheGameData = {
     ts: string;
 };
 
-export type TheGameStateVoiting = {
+export type TheGameStateVoting = {
     action: Extract<Action, 'VOTING'>;
     player: Extract<PlayerName, 'LOOSER'>;
     data: {
@@ -65,7 +65,7 @@ export type TheGameStateResult = {
 export type TheGameState =
     | TheGameStateDefault
     | TheGameStateCoin
-    | TheGameStateVoiting
+    | TheGameStateVoting
     | TheGameStateResult;
 
 export class TheGame {
