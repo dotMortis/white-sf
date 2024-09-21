@@ -14,6 +14,7 @@ export type BackendSocketEvents = {
     vote: (drawVotes: number, passVotes: number, until: number) => void;
     coin: (decision: CoinDecision) => void;
     result: (winner: PlayerName | 'DRAW') => void;
+    waiting: (players: number, minimum: number) => void;
 };
 
 export class BackendSocket extends EventEmitter<BackendSocketEvents> {
@@ -125,6 +126,9 @@ export class BackendSocket extends EventEmitter<BackendSocketEvents> {
                 break;
             case 'RESULT':
                 this.emit('result', this._winner(event.data));
+                break;
+            case 'WAITING':
+                this.emit('waiting', event.data.current, event.data.min);
                 break;
             default:
                 console.log('UNHANDLED EVENT', event);

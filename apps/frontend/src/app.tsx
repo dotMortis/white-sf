@@ -26,6 +26,9 @@ export const App = () => {
     );
     const [decision, setDecision] = useState<CoinDecision | null>(null);
     const [winner, setWinner] = useState<PlayerName | 'DRAW' | null>(null);
+    const [playerCount, setPlayerCount] = useState<
+        readonly [current: number, required: number] | null
+    >(null);
 
     useEffect(() => {
         const drawListener: EventListener<BackendSocketEvents, 'draw'> = (
@@ -40,6 +43,7 @@ export const App = () => {
             setPlayerCards(playerCards);
             setVotes(null);
             setDecision(null);
+            setPlayerCount(null);
         };
 
         const voteListener: EventListener<BackendSocketEvents, 'vote'> = (
@@ -61,16 +65,25 @@ export const App = () => {
             setDecision(null);
         };
 
+        const waitingListener: EventListener<BackendSocketEvents, 'waiting'> = (
+            players,
+            minimum
+        ) => {
+            setPlayerCount([players, minimum]);
+        };
+
         backend.on('draw', drawListener);
         backend.on('vote', voteListener);
         backend.on('coin', coinListener);
         backend.on('result', resultListener);
+        backend.on('waiting', waitingListener);
 
         return () => {
             backend.remove('draw', drawListener);
             backend.remove('vote', voteListener);
             backend.remove('coin', coinListener);
             backend.remove('result', resultListener);
+            backend.remove('waiting', waitingListener);
         };
     }, [backend]);
 
@@ -85,12 +98,14 @@ export const App = () => {
                     until={votes[2]}
                 />
             )}
-            <Overlay open={decision != null || winner != null}>
+            <Overlay open={decision != null || winner != null || playerCount != null}>
                 {decision != null && <CoinFlip decision={decision} />}
                 {winner != null && <ResultDisplay winner={winner} />}
+                {playerCount != null && (
+                    <PlayerCount count={playerCount[0]} required={playerCount[1]} />
+                )}
             </Overlay>
             <LoadingOverlay open={!backendReady} />
-            <PlayerCount count={0} required={3} />
         </main>
     );
 };
