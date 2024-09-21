@@ -1,5 +1,6 @@
-import { CoinDecision, PlayerName, TheGameState } from '@internal/the-game';
+import { CoinDecision, PlayerName, TheGameData, TheGameState } from '@internal/the-game';
 import { EncodedCard } from '@internal/the-game/card';
+import { MAX_POINTS } from '@internal/the-game/global-values';
 import { EventEmitter } from '../util/event-emitter.js';
 
 export type BackendSocketEvents = {
@@ -12,7 +13,7 @@ export type BackendSocketEvents = {
     ) => void;
     vote: (drawVotes: number, passVotes: number, until: number) => void;
     coin: (decision: CoinDecision) => void;
-    result: (winner: PlayerName) => void;
+    result: (winner: PlayerName | 'DRAW') => void;
 };
 
 export class BackendSocket extends EventEmitter<BackendSocketEvents> {
@@ -123,7 +124,7 @@ export class BackendSocket extends EventEmitter<BackendSocketEvents> {
                 this.emit('coin', event.data.decision);
                 break;
             case 'RESULT':
-                this.emit('result', 'BANK');
+                this.emit('result', this._winner(event.data));
                 break;
             default:
                 console.log('UNHANDLED EVENT', event);
@@ -131,5 +132,21 @@ export class BackendSocket extends EventEmitter<BackendSocketEvents> {
         }
 
         this._lastTimestamp = timestamp;
+    }
+
+    private _winner(data: TheGameData): PlayerName | 'DRAW' {
+        const bankPoints = data.bank.points;
+        const humanPoints = data.human.points;
+        const bankLost = bankPoints > MAX_POINTS;
+        const humanLost = humanPoints > MAX_POINTS;
+        return bankLost
+            ? 'LOOSER'
+            : bankPoints < humanPoints
+              ? humanLost
+                  ? 'BANK'
+                  : 'LOOSER'
+              : bankPoints === humanPoints
+                ? 'DRAW'
+                : 'BANK';
     }
 }

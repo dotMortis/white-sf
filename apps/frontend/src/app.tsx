@@ -1,4 +1,4 @@
-import { CoinDecision } from '@internal/the-game';
+import { CoinDecision, PlayerName } from '@internal/the-game';
 import { EncodedCard } from '@internal/the-game/card';
 import { useEffect, useState } from 'preact/hooks';
 import './app.css';
@@ -7,6 +7,7 @@ import { CoinFlip } from './components/coin-flip/coin-flip.js';
 import { LoadingOverlay } from './components/loading-overlay/loading-overlay.js';
 import { Overlay } from './components/overlay/overlay.js';
 import { PlayingTable } from './components/playing-table/playing-table.js';
+import { ResultDisplay } from './components/result-display/result-display.js';
 import { ScoreDisplay } from './components/score-display/score-display.js';
 import { VoteChart } from './components/vote-chart/vote-chart.js';
 import { useBackend } from './hooks/use-backend.js';
@@ -23,6 +24,7 @@ export const App = () => {
         null
     );
     const [decision, setDecision] = useState<CoinDecision | null>(null);
+    const [winner, setWinner] = useState<PlayerName | 'DRAW' | null>(null);
 
     useEffect(() => {
         const drawListener: EventListener<BackendSocketEvents, 'draw'> = (
@@ -52,14 +54,22 @@ export const App = () => {
             setDecision(decision);
         };
 
+        const resultListener: EventListener<BackendSocketEvents, 'result'> = winner => {
+            setWinner(winner);
+            setVotes(null);
+            setDecision(null);
+        };
+
         backend.on('draw', drawListener);
         backend.on('vote', voteListener);
         backend.on('coin', coinListener);
+        backend.on('result', resultListener);
 
         return () => {
             backend.remove('draw', drawListener);
             backend.remove('vote', voteListener);
             backend.remove('coin', coinListener);
+            backend.remove('result', resultListener);
         };
     }, [backend]);
 
@@ -74,8 +84,9 @@ export const App = () => {
                     until={votes[2]}
                 />
             )}
-            <Overlay open={decision != null}>
+            <Overlay open={decision != null || winner != null}>
                 {decision != null && <CoinFlip decision={decision} />}
+                {winner != null && <ResultDisplay winner={winner} />}
             </Overlay>
             <LoadingOverlay open={!backendReady} />
         </main>
