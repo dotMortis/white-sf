@@ -187,7 +187,7 @@ export class TheGame {
     }
 
     private _tick(
-        from: Extract<Action, 'DRAW' | 'PASS' | 'COIN' | 'RESULT'>,
+        from: Extract<Action, 'DRAW' | 'PASS' | 'COIN' | 'RESULT' | 'VOTING'>,
         player: Player<PlayerName>
     ) {
         if (from === 'DRAW') {
@@ -231,6 +231,10 @@ export class TheGame {
                     action: 'RESULT',
                     data: this.data
                 });
+            }, TheGame.TICK_INTERNVAL);
+        } else if (from === 'VOTING') {
+            setTimeout(() => {
+                this._voteMaschine.startVote();
             }, TheGame.TICK_INTERNVAL);
         }
     }
@@ -284,7 +288,7 @@ export class TheGame {
     }
 
     private _startVote(): void {
-        this._voteMaschine.startVote();
+        this._tick('VOTING', this._looser);
     }
 
     private _getDecision(): 'DRAW' | 'PASS' {
