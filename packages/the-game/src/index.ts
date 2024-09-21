@@ -1,5 +1,6 @@
 import { randomInt } from 'crypto';
 import EventEmitter from 'events';
+import { nextTick } from 'process';
 import { CardDeck } from './card-deck.js';
 import { EncodedCard } from './card.js';
 import { BANK_MAX_POINTS, MAX_POINTS } from './global-values.js';
@@ -71,20 +72,21 @@ export type TheGameState =
     | TheGameStateVoting
     | TheGameStateResult;
 
-export type TheGameStatus = 'WAITING_FOR_PLAYERS' | 'RUNNING';
-export type BankStatus = 'DRAW' | 'PASS' | 'LOST' | 'WON';
-export type HumanStatus = 'DRAW' | 'PASS' | 'LOST' | 'WON' | 'VOTING' | 'COIN';
+export type TheGameStatus = 'WAITING_FOR_PLAYERS' | 'RUNNING' | 'ENDING';
+export type BankStatus = 'LOST' | 'WON' | 'DRAW' | 'EVEN' | 'PASS';
+export type HumanStatus = 'EVEN' | 'LOST' | 'WON' | 'VOTING' | 'COIN' | 'DRAW' | 'PASS';
 
 export type TheGameCurrentStatus = {
     gameStatus: TheGameStatus;
     bankStatus: BankStatus;
     humanStatus: HumanStatus;
-    data: TheGameData;
+    data: TheGameState['data'];
 };
 
 export class TheGame {
     static readonly DEFAULT_WAITING_MS = 10_000;
     static readonly TICK_INTERNVAL = 2_500;
+    static readonly MIN_PLAYERS = 3;
 
     private readonly _cardDeck: CardDeck;
     private readonly _voteStack: Array<Vote>;
@@ -112,6 +114,10 @@ export class TheGame {
             gameStatus: 'WAITING_FOR_PLAYERS',
             data: this.data
         };
+    }
+
+    get currentStaus(): TheGameCurrentStatus {
+        return this._currentStatus;
     }
 
     get data(): TheGameData {
@@ -166,7 +172,22 @@ export class TheGame {
         this._bank.resetHand();
         this._looser.addCard(this._cardDeck.draw());
         this._bank.addCard(this._cardDeck.draw());
-        this._tick('DRAW', this._looser);
+        this._setCurrentStatus('STARTING');
+        const interval = setInterval(() => {
+            if (this._start()) {
+                clearInterval(interval);
+            }
+        }, 500);
+    }
+
+    private _start(): boolean {
+        if (this._activePlayers < TheGame.MIN_PLAYERS) {
+            return false;
+        }
+        nextTick(() => {
+            this._tick('DRAW', this._looser);
+        });
+        return true;
     }
 
     onUpdate(listener: (data: TheGameState) => void): void {
@@ -181,7 +202,76 @@ export class TheGame {
         if (data.action === 'RESULT') {
             this._running = false;
         }
+        this._setCurrentStatus(data);
         this._eventEmitter.emit('update', data);
+    }
+
+    private _setCurrentStatus(data: TheGameState | 'STARTING'): void {
+        if (data === 'STARTING') {
+            this._currentStatus = {
+                data: this.data,
+                humanStatus: 'DRAW',
+                bankStatus: 'DRAW',
+                gameStatus: 'WAITING_FOR_PLAYERS'
+            };
+        } else if (data.action === 'RESULT') {
+            this._currentStatus = {
+                data: data.data,
+                gameStatus: 'ENDING',
+                ...this._getWinnerInfo(data.data)
+            };
+        } else if (data.action === 'COIN') {
+            this._currentStatus = {
+                data: data.data,
+                gameStatus: 'RUNNING',
+                bankStatus: 'DRAW',
+                humanStatus: 'COIN'
+            };
+        } else if (data.action === 'DRAW') {
+            this._currentStatus = {
+                data: data.data,
+                bankStatus: 'DRAW',
+                humanStatus: data.player === 'LOOSER' ? 'DRAW' : 'PASS',
+                gameStatus: 'RUNNING'
+            };
+        } else if (data.action === 'PASS') {
+            this._currentStatus = {
+                data: data.data,
+                bankStatus: data.player === 'BANK' ? 'PASS' : 'DRAW',
+                humanStatus: 'PASS',
+                gameStatus: 'RUNNING'
+            };
+        } else if (data.action === 'VOTING') {
+            this._currentStatus = {
+                data: data.data,
+                bankStatus: 'DRAW',
+                humanStatus: 'VOTING',
+                gameStatus: 'RUNNING'
+            };
+        }
+    }
+
+    private _getWinnerInfo(data: TheGameData): Omit<TheGameCurrentStatus, 'data' | 'gameStatus'> {
+        const bankPoints = data.bank.points;
+        const humanPoints = data.human.points;
+        const bankLost = bankPoints > MAX_POINTS;
+        const humanLost = humanPoints > MAX_POINTS;
+        return {
+            bankStatus: bankLost
+                ? 'LOST'
+                : bankPoints < humanPoints
+                  ? 'LOST'
+                  : bankPoints === humanPoints
+                    ? 'EVEN'
+                    : 'WON',
+            humanStatus: humanLost
+                ? 'LOST'
+                : humanPoints < bankPoints
+                  ? 'LOST'
+                  : bankPoints === humanPoints
+                    ? 'EVEN'
+                    : 'WON'
+        };
     }
 
     private _onUpdateVote(vote: VoteState): void {
