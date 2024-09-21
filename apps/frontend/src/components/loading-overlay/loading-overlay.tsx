@@ -9,7 +9,7 @@ export const LoadingOverlay = (properties: LoadingOverlayProperties) => {
         <Overlay {...properties}>
             <div className='loading-overlay'>
                 <div className='content'>
-                    <LoadingSpinner />
+                    <LoadingSpinner size='6em' />
                     <p>Verbinde mit Server...</p>
                 </div>
             </div>

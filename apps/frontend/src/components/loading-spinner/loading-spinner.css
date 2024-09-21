@@ -1,6 +1,6 @@
 /* Based on https://loading.io/css/ */
 .lds-circle {
-    --spinner-size: 8em;
+    --spinner-size: 2em;
 
     /* change color here */
     color: #1c4c5b;
