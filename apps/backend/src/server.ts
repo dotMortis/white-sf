@@ -1,3 +1,6 @@
+import { TheGame } from '@internal/the-game';
+import { CardDeck } from '@internal/the-game/card-deck';
+import { STANDARD_CARDS } from '@internal/the-game/standard-cards';
 import express, { Application } from 'express';
 import { Server } from 'http';
 import { resolve } from 'path';
@@ -10,6 +13,7 @@ export class WebServer {
     private readonly _wss: WebSocketServer;
     private readonly _baseRoute: string;
     private readonly _port: number;
+    private readonly _theGame: TheGame;
     private _server: Server | null;
 
     constructor(baseRoute: string, port: number) {
@@ -18,6 +22,7 @@ export class WebServer {
         this._server = null;
         this._port = port;
         this._baseRoute = this._sanatizeBaseUrl(baseRoute, port);
+        this._theGame = new TheGame(new CardDeck(STANDARD_CARDS));
     }
 
     init(): void {
@@ -26,7 +31,7 @@ export class WebServer {
             '/static',
             express.static(resolve(import.meta.dirname, '..', 'assets'))
         );
-        this._expressApp.use(TELEFON_ROUTER);
+        this._expressApp.use(TELEFON_ROUTER(this._theGame));
         this._expressApp.use(ErrorHandler);
     }
 
@@ -35,6 +40,9 @@ export class WebServer {
             try {
                 this._server ??= this._expressApp.listen(this._port, res);
                 this._addWssHandler(this._server);
+                this._theGame.onUpdate(data =>
+                    this._wss.clients.forEach(client => client.send(JSON.stringify(data)))
+                );
             } catch (error) {
                 rej(error);
             }
