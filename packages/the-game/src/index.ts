@@ -277,14 +277,14 @@ export class TheGame {
         return {
             bankStatus: bankLost
                 ? 'LOST'
-                : bankPoints < humanPoints
+                : bankPoints < humanPoints && !humanLost
                   ? 'LOST'
                   : bankPoints === humanPoints
                     ? 'EVEN'
                     : 'WON',
             humanStatus: humanLost
                 ? 'LOST'
-                : humanPoints < bankPoints
+                : humanPoints < bankPoints && !bankLost
                   ? 'LOST'
                   : bankPoints === humanPoints
                     ? 'EVEN'

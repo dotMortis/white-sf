@@ -37,6 +37,9 @@ export class TelefonController {
     }
 
     stateHandler(): RequestHandler {
-        return (req, res, next) => {};
+        return (req, res, next) => {
+            const state = this._theGame.currentStaus;
+            res.status(200).json({ state });
+        };
     }
 }
