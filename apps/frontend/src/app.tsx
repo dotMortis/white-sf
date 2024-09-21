@@ -36,6 +36,7 @@ export const App = () => {
             setDealerCards(dealerCards);
             setPlayerCards(playerCards);
             setVotes(null);
+            setDecision(null);
         };
 
         const voteListener: EventListener<BackendSocketEvents, 'vote'> = (
@@ -48,11 +49,7 @@ export const App = () => {
 
         const coinListener: EventListener<BackendSocketEvents, 'coin'> = decision => {
             setVotes(null);
-
-            switch (decision) {
-                case 'PENDING':
-                    break;
-            }
+            setDecision(decision);
         };
 
         backend.on('draw', drawListener);
