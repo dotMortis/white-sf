@@ -10,7 +10,7 @@ export const PlayerCount = (properties: PlayerCountProperties) => {
     const { count, required } = properties;
     return (
         <div className='player-count'>
-            <img src={`${ServerUrl}/static/`}></img>
+            <img src={`${ServerUrl}/static/waiting.png`}></img>
             <div className='panel'>
                 Spieler: {count} (Mindestens {required} benötigt)
             </div>
