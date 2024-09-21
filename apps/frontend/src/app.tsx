@@ -58,7 +58,7 @@ export const App = () => {
         <main className='app'>
             <PlayingTable dealerCards={dealerCards} playerCards={playerCards} />
             <ScoreDisplay dealerScore={scores[0]} playerScore={scores[1]} />
-            {votes != null && <VoteChart votes={votes} categories={['Draw', 'Pass']} />}
+            {votes != null && <VoteChart votes={votes} categories={['Ziehen', 'Passen']} />}
             <Overlay open={true}>
                 <p style={{ backgroundColor: 'white' }}></p>
             </Overlay>
