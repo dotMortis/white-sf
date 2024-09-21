@@ -1,3 +1,4 @@
+import { EncodedCard } from '@internal/the-game/card';
 import { useEffect, useState } from 'preact/hooks';
 import './app.css';
 import { BackendSocketEvents } from './backend/backend-socket.js';
@@ -14,6 +15,8 @@ const WebsocketUrl = 'ws://localhost:3000';
 export const App = () => {
     const [backend, backendReady] = useBackend(WebsocketUrl);
     const [scores, setScores] = useState([0, 0]);
+    const [playerCards, setPlayerCards] = useState<ReadonlyArray<EncodedCard>>([]);
+    const [dealerCards, setDealerCards] = useState<ReadonlyArray<EncodedCard>>([]);
 
     useEffect(() => {
         const drawListener: EventListener<BackendSocketEvents, 'draw'> = (
@@ -24,6 +27,8 @@ export const App = () => {
             playerScore
         ) => {
             setScores([dealerScore, playerScore]);
+            setDealerCards(dealerCards);
+            setPlayerCards(playerCards);
         };
 
         backend.on('draw', drawListener);
@@ -35,7 +40,7 @@ export const App = () => {
 
     return (
         <main className='app'>
-            <PlayingTable />
+            <PlayingTable dealerCards={dealerCards} playerCards={playerCards} />
             <ScoreDisplay dealerScore={scores[0]} playerScore={scores[1]} />
             <VoteChart votes={[4, 6]} categories={['Draw', 'Pass']} />
             <Overlay open={true}>
