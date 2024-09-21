@@ -30,5 +30,6 @@ export class Player<NAME extends string = string> {
 
     resetHand(): void {
         this._cards.length = 0;
+        this._points = 0;
     }
 }
