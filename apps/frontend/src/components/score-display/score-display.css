@@ -21,9 +21,29 @@
     border-radius: 4px;
 }
 
-.score-display > .panel > .score {
+.score-display > .panel .score {
     font-family: inherit;
     font-size: 3rem;
 
     color: white;
+}
+
+.score-display .icon {
+    width: 96px;
+
+    background-color: white;
+
+    border-radius: 50%;
+}
+
+.score-display img {
+    width: 100%;
+}
+
+.score-display .row {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 2em;
 }
