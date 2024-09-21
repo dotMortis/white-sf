@@ -1,0 +1,14 @@
+.playing-table {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+    grid-template-areas: 'dealer' 'player';
+}
+
+.playing-table > .dealer-view {
+    grid-area: dealer;
+}
+
+.playing-table > .player-view {
+    grid-area: player;
+}

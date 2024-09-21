@@ -1,0 +1,24 @@
+.player-view {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+
+    padding: 6em;
+
+    background-color: blue;
+}
+
+.player-view > .drawn-cards {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 4em;
+
+    height: 100%;
+}
+
+.player-view > .drawn-cards > .playing-card {
+    height: 100%;
+}
