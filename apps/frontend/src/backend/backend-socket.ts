@@ -10,7 +10,7 @@ export type BackendSocketEvents = {
         playerCards: ReadonlyArray<EncodedCard>,
         playerScore: number
     ) => void;
-    vote: (drawVotes: number, passVotes: number) => void;
+    vote: (drawVotes: number, passVotes: number, until: number) => void;
     coin: (decision: CoinDecision) => void;
 };
 
@@ -111,7 +111,12 @@ export class BackendSocket extends EventEmitter<BackendSocketEvents> {
                 );
                 break;
             case 'VOTING':
-                this.emit('vote', event.data.votings.current.draw, event.data.votings.current.pass);
+                this.emit(
+                    'vote',
+                    event.data.votings.current.draw,
+                    event.data.votings.current.pass,
+                    new Date(event.data.votings.until ?? Date.now()).getTime()
+                );
                 break;
             case 'COIN':
                 this.emit('coin', event.data.decision);

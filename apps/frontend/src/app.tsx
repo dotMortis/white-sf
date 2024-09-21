@@ -19,7 +19,9 @@ export const App = () => {
     const [scores, setScores] = useState([0, 0]);
     const [playerCards, setPlayerCards] = useState<ReadonlyArray<EncodedCard>>([]);
     const [dealerCards, setDealerCards] = useState<ReadonlyArray<EncodedCard>>([]);
-    const [votes, setVotes] = useState<readonly [draw: number, pass: number] | null>(null);
+    const [votes, setVotes] = useState<readonly [draw: number, pass: number, until: number] | null>(
+        null
+    );
     const [decision, setDecision] = useState<CoinDecision | null>(null);
 
     useEffect(() => {
@@ -36,8 +38,12 @@ export const App = () => {
             setVotes(null);
         };
 
-        const voteListener: EventListener<BackendSocketEvents, 'vote'> = (drawVotes, passVotes) => {
-            setVotes([drawVotes, passVotes]);
+        const voteListener: EventListener<BackendSocketEvents, 'vote'> = (
+            drawVotes,
+            passVotes,
+            until
+        ) => {
+            setVotes([drawVotes, passVotes, until]);
         };
 
         const coinListener: EventListener<BackendSocketEvents, 'coin'> = decision => {
@@ -64,7 +70,13 @@ export const App = () => {
         <main className='app'>
             <PlayingTable dealerCards={dealerCards} playerCards={playerCards} />
             <ScoreDisplay dealerScore={scores[0]} playerScore={scores[1]} />
-            {votes != null && <VoteChart votes={votes} categories={['Ziehen', 'Passen']} />}
+            {votes != null && (
+                <VoteChart
+                    votes={votes.slice(0, 2) as [number, number]}
+                    categories={['Ziehen', 'Passen']}
+                    until={votes[2]}
+                />
+            )}
             <Overlay open={decision != null}>
                 {decision != null && <CoinFlip decision={decision} />}
             </Overlay>
