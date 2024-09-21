@@ -1,3 +1,4 @@
+import { CoinDecision } from '@internal/the-game';
 import { EncodedCard } from '@internal/the-game/card';
 import { useEffect, useState } from 'preact/hooks';
 import './app.css';
@@ -18,6 +19,7 @@ export const App = () => {
     const [playerCards, setPlayerCards] = useState<ReadonlyArray<EncodedCard>>([]);
     const [dealerCards, setDealerCards] = useState<ReadonlyArray<EncodedCard>>([]);
     const [votes, setVotes] = useState<readonly [draw: number, pass: number] | null>(null);
+    const [decision, setDecision] = useState<CoinDecision | null>(null);
 
     useEffect(() => {
         const drawListener: EventListener<BackendSocketEvents, 'draw'> = (
@@ -37,12 +39,18 @@ export const App = () => {
             setVotes([drawVotes, passVotes]);
         };
 
+        const coinListener: EventListener<BackendSocketEvents, 'coin'> = decision => {
+            setVotes(null);
+        };
+
         backend.on('draw', drawListener);
         backend.on('vote', voteListener);
+        backend.on('coin', coinListener);
 
         return () => {
             backend.remove('draw', drawListener);
             backend.remove('vote', voteListener);
+            backend.remove('coin', coinListener);
         };
     }, [backend]);
 

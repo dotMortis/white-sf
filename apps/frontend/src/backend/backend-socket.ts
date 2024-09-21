@@ -1,4 +1,4 @@
-import { PlayerName, TheGameState } from '@internal/the-game';
+import { CoinDecision, PlayerName, TheGameState } from '@internal/the-game';
 import { EncodedCard } from '@internal/the-game/card';
 import { EventEmitter } from '../util/event-emitter.js';
 
@@ -11,6 +11,7 @@ export type BackendSocketEvents = {
         playerScore: number
     ) => void;
     vote: (drawVotes: number, passVotes: number) => void;
+    coin: (decision: CoinDecision) => void;
 };
 
 export class BackendSocket extends EventEmitter<BackendSocketEvents> {
@@ -111,6 +112,9 @@ export class BackendSocket extends EventEmitter<BackendSocketEvents> {
                 break;
             case 'VOTING':
                 this.emit('vote', event.data.votings.current.draw, event.data.votings.current.pass);
+                break;
+            case 'COIN':
+                this.emit('coin', event.data.decision);
                 break;
             default:
                 console.log('UNHANDLED EVENT', event);

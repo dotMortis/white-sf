@@ -11,11 +11,13 @@ export type PlayerName = 'BANK' | 'LOOSER';
 
 export type Action = 'DRAW' | 'PASS' | 'RESULT' | 'VOTING' | 'CANCEL' | 'COIN';
 
+export type CoinDecision = 'DRAW' | 'PASS' | 'PENDING';
+
 export type TheGameStateCoin = {
     action: Extract<Action, 'COIN'>;
     player: Extract<PlayerName, 'LOOSER'>;
     data: {
-        decision: 'DRAW' | 'PASS' | 'PENDING';
+        decision: CoinDecision;
     };
     ts: string;
 };
