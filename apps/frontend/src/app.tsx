@@ -17,6 +17,7 @@ export const App = () => {
     const [scores, setScores] = useState([0, 0]);
     const [playerCards, setPlayerCards] = useState<ReadonlyArray<EncodedCard>>([]);
     const [dealerCards, setDealerCards] = useState<ReadonlyArray<EncodedCard>>([]);
+    const [votes, setVotes] = useState<readonly [draw: number, pass: number] | null>(null);
 
     useEffect(() => {
         const drawListener: EventListener<BackendSocketEvents, 'draw'> = (
@@ -42,7 +43,7 @@ export const App = () => {
         <main className='app'>
             <PlayingTable dealerCards={dealerCards} playerCards={playerCards} />
             <ScoreDisplay dealerScore={scores[0]} playerScore={scores[1]} />
-            <VoteChart votes={[4, 6]} categories={['Draw', 'Pass']} />
+            {votes != null && <VoteChart votes={votes} categories={['Draw', 'Pass']} />}
             <Overlay open={true}>
                 <p style={{ backgroundColor: 'white' }}></p>
             </Overlay>
