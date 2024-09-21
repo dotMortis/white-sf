@@ -14,6 +14,7 @@ export const VoteChart = (properties: VoteChartProperties) => {
     return (
         <div className='vote-chart'>
             <h1>Abstimmung</h1>
+            <div className='progress-bar' style={{ '--percentage': `50%` }}></div>
             <div className='bars'>
                 {percentages.map((percentage, i) => (
                     <div
