@@ -17,6 +17,7 @@ export type TheGameStateCoin = {
     data: {
         decision: 'DRAW' | 'PASS';
     };
+    ts: string;
 };
 
 export type TheGameData = {
@@ -33,6 +34,7 @@ export type TheGameData = {
         current: Vote;
         past: ReadonlyArray<Vote>;
     };
+    ts: string;
 };
 
 export type TheGameStateVoiting = {
@@ -44,17 +46,20 @@ export type TheGameStateVoiting = {
             past: ReadonlyArray<Vote>;
         };
     };
+    ts: string;
 };
 
 export type TheGameStateDefault = {
     action: Extract<Action, 'PASS' | 'DRAW' | 'CANCEL'>;
     player: PlayerName;
     data: TheGameData;
+    ts: string;
 };
 
 export type TheGameStateResult = {
     action: Extract<Action, 'RESULT'>;
     data: TheGameData;
+    ts: string;
 };
 
 export type TheGameState =
@@ -102,7 +107,8 @@ export class TheGame {
             votings: {
                 current: this._voteMaschine.state.vote,
                 past: this._voteStack
-            }
+            },
+            ts: new Date().toISOString()
         };
     }
 
@@ -154,6 +160,7 @@ export class TheGame {
     }
 
     private _onUpdateVote(vote: VoteState): void {
+        console.log('UPDATE VOTE', { vote });
         if (vote.status === 'DONE') {
             this._voteStack.unshift(vote.vote);
             if (vote.vote.draw > vote.vote.pass) {
@@ -172,30 +179,35 @@ export class TheGame {
                         current: vote.vote,
                         past: this._voteStack
                     }
-                }
+                },
+                ts: new Date().toISOString()
             });
         }
     }
 
     private _playerDraw(player: Player<PlayerName>): void {
+        console.log('DRAW', { player: player.name });
         player.addCard(this._cardDeck.draw());
         this._tick('DRAW', player);
     }
 
     private _playerPass(player: Player<PlayerName>): void {
+        console.log('PASS', { player: player.name });
         this._tick('PASS', player);
     }
 
     private _tick(
-        from: Extract<Action, 'DRAW' | 'PASS' | 'COIN' | 'RESULT'>,
+        from: Extract<Action, 'DRAW' | 'PASS' | 'COIN' | 'RESULT' | 'VOTING'>,
         player: Player<PlayerName>
     ) {
+        console.log('TICK', { from, player: player.name });
         if (from === 'DRAW') {
             setTimeout(() => {
                 this._emitUpdate({
                     action: 'DRAW',
                     player: player.name,
-                    data: this.data
+                    data: this.data,
+                    ts: new Date().toISOString()
                 });
                 this._runNextStep('DRAW', player);
             }, TheGame.TICK_INTERNVAL);
@@ -204,11 +216,11 @@ export class TheGame {
                 this._emitUpdate({
                     action: 'PASS',
                     player: player.name,
-                    data: this.data
+                    data: this.data,
+                    ts: new Date().toISOString()
                 });
-                this._runNextStep('DRAW', player);
+                this._runNextStep('PASS', player);
             }, TheGame.TICK_INTERNVAL);
-            this._runNextStep('PASS', player);
         } else if (from === 'COIN') {
             setTimeout(() => {
                 const decision = this._getDecision();
@@ -217,25 +229,32 @@ export class TheGame {
                     player: 'LOOSER',
                     data: {
                         decision
-                    }
+                    },
+                    ts: new Date().toISOString()
                 });
                 if (decision === 'DRAW') {
-                    this._playerDraw(this._looser);
+                    this._playerDraw(player);
                 } else {
-                    this._playerPass(this._looser);
+                    this._playerPass(player);
                 }
             }, TheGame.TICK_INTERNVAL);
         } else if (from === 'RESULT') {
             setTimeout(() => {
                 this._emitUpdate({
                     action: 'RESULT',
-                    data: this.data
+                    data: this.data,
+                    ts: new Date().toISOString()
                 });
+            }, TheGame.TICK_INTERNVAL);
+        } else if (from === 'VOTING') {
+            setTimeout(() => {
+                this._voteMaschine.startVote();
             }, TheGame.TICK_INTERNVAL);
         }
     }
 
     private _runNextStep(from: Extract<Action, 'DRAW' | 'PASS'>, player: Player<PlayerName>): void {
+        console.log('RUN NEXT', { from, player: player.name });
         if (from === 'PASS' && player.name === 'LOOSER') {
             this._finalizeBank();
         } else if (from === 'PASS' && player.name === 'BANK') {
@@ -261,30 +280,37 @@ export class TheGame {
 
     private _nextBankTurn(): void {
         if (this._bank.points < BANK_MAX_POINTS) {
+            console.log('_nextBankTurn DRAW');
             this._playerDraw(this._bank);
         } else {
+            console.log('_nextBankTurn PASS');
             this._playerPass(this._bank);
         }
     }
 
     private _finalizeBank(): void {
+        console.log('_finalizeBank');
         this._nextBankTurn();
     }
 
     private _finalizeGame(): void {
+        console.log('_finalizeGame');
         this._tick('RESULT', this._bank);
     }
 
     private _looserLost(): void {
+        console.log('_looserLost');
         this._tick('RESULT', this._looser);
     }
 
     private _bankLost(): void {
+        console.log('_bankLost');
         this._tick('RESULT', this._bank);
     }
 
     private _startVote(): void {
-        this._voteMaschine.startVote();
+        console.log('_startVote');
+        this._tick('VOTING', this._looser);
     }
 
     private _getDecision(): 'DRAW' | 'PASS' {
