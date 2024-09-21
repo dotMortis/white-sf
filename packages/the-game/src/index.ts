@@ -10,7 +10,7 @@ import { Vote } from './vote/vote.js';
 
 export type PlayerName = 'BANK' | 'LOOSER';
 
-export type Action = 'DRAW' | 'PASS' | 'RESULT' | 'VOTING' | 'CANCEL' | 'COIN' | 'WAITING';
+export type Action = 'DRAW' | 'PASS' | 'RESULT' | 'VOTING' | 'COIN' | 'WAITING';
 
 export type CoinDecision = 'DRAW' | 'PASS' | 'PENDING';
 
