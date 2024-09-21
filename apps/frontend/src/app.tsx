@@ -3,6 +3,7 @@ import { EncodedCard } from '@internal/the-game/card';
 import { useEffect, useState } from 'preact/hooks';
 import './app.css';
 import { BackendSocketEvents } from './backend/backend-socket.js';
+import { CoinFlip } from './components/coin-flip/coin-flip.js';
 import { LoadingOverlay } from './components/loading-overlay/loading-overlay.js';
 import { Overlay } from './components/overlay/overlay.js';
 import { PlayingTable } from './components/playing-table/playing-table.js';
@@ -41,6 +42,11 @@ export const App = () => {
 
         const coinListener: EventListener<BackendSocketEvents, 'coin'> = decision => {
             setVotes(null);
+
+            switch (decision) {
+                case 'PENDING':
+                    break;
+            }
         };
 
         backend.on('draw', drawListener);
@@ -59,8 +65,8 @@ export const App = () => {
             <PlayingTable dealerCards={dealerCards} playerCards={playerCards} />
             <ScoreDisplay dealerScore={scores[0]} playerScore={scores[1]} />
             {votes != null && <VoteChart votes={votes} categories={['Ziehen', 'Passen']} />}
-            <Overlay open={true}>
-                <p style={{ backgroundColor: 'white' }}></p>
+            <Overlay open={decision != null}>
+                {decision != null && <CoinFlip decision={decision} />}
             </Overlay>
             <LoadingOverlay open={!backendReady} />
         </main>
