@@ -6,6 +6,7 @@ import { BackendSocketEvents } from './backend/backend-socket.js';
 import { CoinFlip } from './components/coin-flip/coin-flip.js';
 import { LoadingOverlay } from './components/loading-overlay/loading-overlay.js';
 import { Overlay } from './components/overlay/overlay.js';
+import { PlayerCount } from './components/player-count/player-count.js';
 import { PlayingTable } from './components/playing-table/playing-table.js';
 import { ResultDisplay } from './components/result-display/result-display.js';
 import { ScoreDisplay } from './components/score-display/score-display.js';
@@ -89,6 +90,7 @@ export const App = () => {
                 {winner != null && <ResultDisplay winner={winner} />}
             </Overlay>
             <LoadingOverlay open={!backendReady} />
+            <PlayerCount count={0} required={3} />
         </main>
     );
 };
