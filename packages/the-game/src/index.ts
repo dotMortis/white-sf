@@ -15,7 +15,7 @@ export type TheGameStateCoin = {
     action: Extract<Action, 'COIN'>;
     player: Extract<PlayerName, 'LOOSER'>;
     data: {
-        decision: 'DRAW' | 'PASS';
+        decision: 'DRAW' | 'PASS' | 'PENDING';
     };
     ts: string;
 };
@@ -232,15 +232,25 @@ export class TheGame {
                     action: 'COIN',
                     player: 'LOOSER',
                     data: {
-                        decision
+                        decision: 'PENDING'
                     },
                     ts: new Date().toISOString()
                 });
-                if (decision === 'DRAW') {
-                    this._playerDraw(player);
-                } else {
-                    this._playerPass(player);
-                }
+                setTimeout(() => {
+                    this._emitUpdate({
+                        action: 'COIN',
+                        player: 'LOOSER',
+                        data: {
+                            decision
+                        },
+                        ts: new Date().toISOString()
+                    });
+                    if (decision === 'DRAW') {
+                        this._playerDraw(player);
+                    } else {
+                        this._playerPass(player);
+                    }
+                }, TheGame.TICK_INTERNVAL);
             }, TheGame.TICK_INTERNVAL);
         } else if (from === 'RESULT') {
             setTimeout(() => {
