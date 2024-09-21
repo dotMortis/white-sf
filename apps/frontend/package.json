@@ -7,7 +7,7 @@
     "scripts": {
         "dev": "vite",
         "prod": "NODE_ENV=production node ./dist/src/index.js",
-        "build": "rm -rf ./dist && tsc -p ./tsconfig.build.json",
+        "build": "rm -rf ./dist && vite build",
         "lint": "eslint . --fix",
         "typecheck": "tsc -p ./tsconfig.build.json --noEmit",
         "typecheck:watch": "pnpm typecheck --watch",
