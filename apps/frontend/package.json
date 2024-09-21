@@ -28,6 +28,7 @@
     },
     "dependencies": {
         "@internal/shared": "workspace:^",
+        "@internal/the-game": "workspace:^",
         "preact": "^10.23.2"
     },
     "devDependencies": {

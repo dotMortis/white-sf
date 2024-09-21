@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { BackendSocket } from '../backend/backend-socket.js';
 
-export const useBackend = (url: string) => {
+export const useBackend = (url: string): readonly [BackendSocket, boolean] => {
     const backend = useMemo(() => new BackendSocket(url), []);
     const [backendReady, setBackendReady] = useState(false);
     const [tryCount, setTryCount] = useState(1);

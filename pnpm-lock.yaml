@@ -87,6 +87,9 @@ importers:
       '@internal/shared':
         specifier: workspace:^
         version: link:../../packages/shared
+      '@internal/the-game':
+        specifier: workspace:^
+        version: link:../../packages/the-game
       preact:
         specifier: ^10.23.2
         version: 10.24.0
