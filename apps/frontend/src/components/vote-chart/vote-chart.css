@@ -1,0 +1,29 @@
+.vote-chart {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+}
+
+.vote-chart > .bars {
+    align-items: flex-end;
+
+    flex-grow: 1;
+}
+
+.vote-chart > .bars,
+.vote-chart > .categories {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-evenly;
+
+    width: 100%;
+}
+
+.vote-chart > .bars > .bar {
+    width: 25%;
+    height: var(--percentage);
+
+    background-color: blue;
+
+    transition: height 0.5s;
+}
