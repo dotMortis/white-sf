@@ -2,6 +2,10 @@
     "extends": "./node_modules/@bits_devel/tsconfig/esm.json",
     "compilerOptions": {
         "declaration": false,
-        "outDir": "./dist"
+        "outDir": "./dist",
+        "isolatedModules": true,
+        "jsx": "react-jsx",
+        "jsxImportSource": "preact",
+        "lib": ["DOM", "ES2022"]
     }
 }

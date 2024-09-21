@@ -5,7 +5,7 @@
     "main": "./dist/src/index.js",
     "private": true,
     "scripts": {
-        "dev": "nodemon -q ./src/index.ts",
+        "dev": "vite",
         "prod": "NODE_ENV=production node ./dist/src/index.js",
         "build": "rm -rf ./dist && tsc -p ./tsconfig.build.json",
         "lint": "eslint . --fix",
@@ -27,13 +27,15 @@
         "depcheck": "depcheck"
     },
     "dependencies": {
-        "@internal/shared": "workspace:^"
+        "@internal/shared": "workspace:^",
+        "preact": "^10.23.2"
     },
     "devDependencies": {
         "@bits_devel/eslint-config-bits": "latest",
         "@bits_devel/tsconfig": "latest",
         "@types/node": "^20",
         "@vitest/coverage-v8": "^2",
+        "@preact/preset-vite": "^2.9.0",
         "nodemon": "^3",
         "prettier": "^3",
         "ts-node": "^10",

@@ -1,0 +1,8 @@
+.playing-card {
+    background-color: white;
+
+    aspect-ratio: 3/5;
+
+    border: 2px solid gray;
+    border-radius: 20px;
+}

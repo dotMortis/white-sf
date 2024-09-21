@@ -1,0 +1,29 @@
+.score-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.score-display > .panel {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1em;
+}
+
+.score-display > .panel > .separator {
+    width: 20vw;
+    height: 4px;
+
+    background-color: white;
+
+    border-radius: 4px;
+}
+
+.score-display > .panel > .score {
+    font-family: system-ui, sans-serif;
+    font-size: 3rem;
+
+    color: white;
+}

@@ -1,0 +1,31 @@
+.dealer-view {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8em;
+
+    padding: 6em;
+
+    background-color: green;
+}
+
+.dealer-view > .drawn-cards {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 4em;
+
+    height: 100%;
+
+    flex-grow: 1;
+}
+
+.dealer-view > .drawn-cards > .playing-card {
+    height: 100%;
+}
+
+.dealer-view > .card-deck {
+    height: 100%;
+}
