@@ -10,6 +10,7 @@ export class TelefonController {
 
     registerHandler(): RequestHandler {
         return (req, res, next) => {
+            this._theGame.playerUp();
             res.status(200).json({ status: 'registered' });
         };
     }
