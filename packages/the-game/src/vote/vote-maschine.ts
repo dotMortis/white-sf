@@ -4,6 +4,7 @@ import { Vote } from './vote.js';
 export type VoteState = {
     status: 'DONE' | 'RUNNING';
     vote: Vote;
+    until: Date | null;
 };
 
 export class VoteMaschine {
@@ -11,18 +12,24 @@ export class VoteMaschine {
     private _voteRunning: NodeJS.Timeout | null;
     private _currentVote: Vote;
     private _eventEmitter: EventEmitter;
+    private _runningSince: Date | null;
 
     constructor(voteDuration: number) {
         this._voteDuration = voteDuration;
         this._voteRunning = null;
         this._currentVote = { draw: 0, pass: 0 };
         this._eventEmitter = new EventEmitter();
+        this._runningSince = null;
     }
 
     get state(): VoteState {
         return {
             status: this._voteRunning === null ? 'DONE' : 'RUNNING',
-            vote: this._currentVote
+            vote: this._currentVote,
+            until:
+                this._runningSince === null
+                    ? null
+                    : new Date(this._runningSince.getTime() + this._voteDuration)
         };
     }
 
@@ -85,6 +92,7 @@ export class VoteMaschine {
         }
         if (this._voteRunning !== value) {
             this._voteRunning = value;
+            this._runningSince = value !== null ? new Date() : null;
             this._emitUpdate(this.state);
         }
     }

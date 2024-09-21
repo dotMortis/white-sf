@@ -46,6 +46,7 @@ export type TheGameStateVoting = {
         votings: {
             current: Vote;
             past: ReadonlyArray<Vote>;
+            until: string | null;
         };
     };
     ts: string;
@@ -70,6 +71,17 @@ export type TheGameState =
     | TheGameStateVoting
     | TheGameStateResult;
 
+export type TheGameStatus = 'WAITING_FOR_PLAYERS' | 'RUNNING';
+export type BankStatus = 'DRAW' | 'PASS' | 'LOST' | 'WON';
+export type HumanStatus = 'DRAW' | 'PASS' | 'LOST' | 'WON' | 'VOTING' | 'COIN';
+
+export type TheGameCurrentStatus = {
+    gameStatus: TheGameStatus;
+    bankStatus: BankStatus;
+    humanStatus: HumanStatus;
+    data: TheGameData;
+};
+
 export class TheGame {
     static readonly DEFAULT_WAITING_MS = 10_000;
     static readonly TICK_INTERNVAL = 2_500;
@@ -82,6 +94,7 @@ export class TheGame {
     private readonly _bank: Player<Extract<PlayerName, 'BANK'>>;
     private _running: boolean;
     private _activePlayers: number;
+    private _currentStatus: TheGameCurrentStatus;
 
     constructor(cardDeck: CardDeck) {
         this._cardDeck = cardDeck;
@@ -93,6 +106,12 @@ export class TheGame {
         this._eventEmitter = new EventEmitter();
         this._voteMaschine = new VoteMaschine(TheGame.DEFAULT_WAITING_MS);
         this._voteMaschine.onUpdate(data => this._onUpdateVote(data));
+        this._currentStatus = {
+            bankStatus: 'DRAW',
+            humanStatus: 'DRAW',
+            gameStatus: 'WAITING_FOR_PLAYERS',
+            data: this.data
+        };
     }
 
     get data(): TheGameData {
@@ -166,7 +185,6 @@ export class TheGame {
     }
 
     private _onUpdateVote(vote: VoteState): void {
-        console.log('UPDATE VOTE', { vote });
         if (vote.status === 'DONE') {
             this._voteStack.unshift(vote.vote);
             if (vote.vote.draw > vote.vote.pass) {
@@ -183,7 +201,8 @@ export class TheGame {
                 data: {
                     votings: {
                         current: vote.vote,
-                        past: this._voteStack
+                        past: this._voteStack,
+                        until: vote.until?.toISOString() ?? null
                     }
                 },
                 ts: new Date().toISOString()
@@ -192,13 +211,11 @@ export class TheGame {
     }
 
     private _playerDraw(player: Player<PlayerName>): void {
-        console.log('DRAW', { player: player.name });
         player.addCard(this._cardDeck.draw());
         this._tick('DRAW', player);
     }
 
     private _playerPass(player: Player<PlayerName>): void {
-        console.log('PASS', { player: player.name });
         this._tick('PASS', player);
     }
 
@@ -206,7 +223,6 @@ export class TheGame {
         from: Extract<Action, 'DRAW' | 'PASS' | 'COIN' | 'RESULT' | 'VOTING'>,
         player: Player<PlayerName>
     ) {
-        console.log('TICK', { from, player: player.name });
         if (from === 'DRAW') {
             setTimeout(() => {
                 this._emitUpdate({
@@ -270,7 +286,6 @@ export class TheGame {
     }
 
     private _runNextStep(from: Extract<Action, 'DRAW' | 'PASS'>, player: Player<PlayerName>): void {
-        console.log('RUN NEXT', { from, player: player.name });
         if (from === 'PASS' && player.name === 'LOOSER') {
             this._finalizeBank();
         } else if (from === 'PASS' && player.name === 'BANK') {
@@ -296,36 +311,29 @@ export class TheGame {
 
     private _nextBankTurn(): void {
         if (this._bank.points < BANK_MAX_POINTS) {
-            console.log('_nextBankTurn DRAW');
             this._playerDraw(this._bank);
         } else {
-            console.log('_nextBankTurn PASS');
             this._playerPass(this._bank);
         }
     }
 
     private _finalizeBank(): void {
-        console.log('_finalizeBank');
         this._nextBankTurn();
     }
 
     private _finalizeGame(): void {
-        console.log('_finalizeGame');
         this._tick('RESULT', this._bank);
     }
 
     private _looserLost(): void {
-        console.log('_looserLost');
         this._tick('RESULT', this._looser);
     }
 
     private _bankLost(): void {
-        console.log('_bankLost');
         this._tick('RESULT', this._bank);
     }
 
     private _startVote(): void {
-        console.log('_startVote');
         this._tick('VOTING', this._looser);
     }
 

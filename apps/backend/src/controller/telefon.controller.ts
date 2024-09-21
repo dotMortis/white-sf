@@ -35,4 +35,8 @@ export class TelefonController {
             res.status(200).json({ status: 'voted draw' });
         };
     }
+
+    stateHandler(): RequestHandler {
+        return (req, res, next) => {};
+    }
 }
