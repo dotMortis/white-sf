@@ -6,8 +6,10 @@ import { ScoreDisplay } from './components/score-display/score-display.js';
 import { VoteChart } from './components/vote-chart/vote-chart.js';
 import { useBackend } from './hooks/use-backend.js';
 
+const WebsocketUrl = 'ws://localhost:3000';
+
 export const App = () => {
-    const [backend, backendReady] = useBackend();
+    const [backend, backendReady] = useBackend(WebsocketUrl);
 
     return (
         <main className='app'>
