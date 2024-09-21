@@ -5,7 +5,7 @@
     align-items: center;
     gap: 8em;
 
-    padding: 6em;
+    padding: 3em 6em 10em 6em;
 }
 
 .dealer-view > .drawn-cards {
