@@ -44,6 +44,7 @@ export const App = () => {
             setVotes(null);
             setDecision(null);
             setPlayerCount(null);
+            setWinner(null);
         };
 
         const voteListener: EventListener<BackendSocketEvents, 'vote'> = (
@@ -57,12 +58,14 @@ export const App = () => {
         const coinListener: EventListener<BackendSocketEvents, 'coin'> = decision => {
             setVotes(null);
             setDecision(decision);
+            setPlayerCount(null);
         };
 
         const resultListener: EventListener<BackendSocketEvents, 'result'> = winner => {
             setWinner(winner);
             setVotes(null);
             setDecision(null);
+            setPlayerCount(null);
         };
 
         const waitingListener: EventListener<BackendSocketEvents, 'waiting'> = (
@@ -70,6 +73,7 @@ export const App = () => {
             minimum
         ) => {
             setPlayerCount([players, minimum]);
+            setWinner(null);
         };
 
         backend.on('draw', drawListener);
