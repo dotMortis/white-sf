@@ -30,6 +30,42 @@
         "./README.md"
     ],
     "exports": {
+        "./card-deck": {
+            "types": "./src/card-deck.ts",
+            "default": "./dist/card-deck.js"
+        },
+        "./card-suite": {
+            "types": "./src/card-suite.ts",
+            "default": "./dist/card-suite.js"
+        },
+        "./card": {
+            "types": "./src/card.ts",
+            "default": "./dist/card.js"
+        },
+        "./standard-cards": {
+            "types": "./src/cards/standard-cards.ts",
+            "default": "./dist/cards/standard-cards.js"
+        },
+        "./global-values": {
+            "types": "./src/global-values.ts",
+            "default": "./dist/global-values.js"
+        },
+        ".": {
+            "types": "./src/index.ts",
+            "default": "./dist/index.js"
+        },
+        "./player": {
+            "types": "./src/player.ts",
+            "default": "./dist/player.js"
+        },
+        "./vote-maschine": {
+            "types": "./src/vote/vote-maschine.ts",
+            "default": "./dist/vote/vote-maschine.js"
+        },
+        "./vote": {
+            "types": "./src/vote/vote.ts",
+            "default": "./dist/vote/vote.js"
+        },
         "./package.json": "./package.json"
     },
     "name": "@internal/the-game",
