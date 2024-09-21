@@ -22,7 +22,7 @@
 }
 
 .score-display > .panel > .score {
-    font-family: system-ui, sans-serif;
+    font-family: inherit;
     font-size: 3rem;
 
     color: white;
