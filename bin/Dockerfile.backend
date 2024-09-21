@@ -1,0 +1,26 @@
+#This is a comment
+
+#use lightweight debian os
+FROM node:20-bullseye
+
+
+#COPY SOURCE DESTINATION
+#COPY Server into /whitesf
+WORKDIR /home/node/app
+RUN su node
+
+COPY ./apps/backend/dist/out/backend.tar.gz backend.tar.gz
+
+#unzip backend
+RUN ["tar","-xf","backend.tar.gz"]
+
+# COPY assets into proj
+COPY ./apps/backend/assets backend/assets
+
+WORKDIR /home/node/app/backend
+RUN cd /home/node/app/backend
+
+#START server
+EXPOSE 3000
+
+ENTRYPOINT ["node", "dist/index.js"]

@@ -7,6 +7,7 @@
     "scripts": {
         "dev": "nodemon -q ./src/index.ts",
         "prod": "NODE_ENV=production node ./dist/src/index.js",
+        "deploy": "rm -rf ./dist/out && pnpm --filter backend --prod deploy ./dist/out/backend && cd dist/out && tar czpf backend.tar.gz backend/",
         "build": "rm -rf ./dist && tsc -p ./tsconfig.build.json",
         "lint": "eslint . --fix",
         "typecheck": "tsc -p ./tsconfig.build.json --noEmit",
