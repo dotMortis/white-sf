@@ -78,7 +78,7 @@ export class TheGame {
     private readonly _eventEmitter: EventEmitter;
     private readonly _looser: Player<Extract<PlayerName, 'LOOSER'>>;
     private readonly _bank: Player<Extract<PlayerName, 'BANK'>>;
-    private readonly _running: boolean;
+    private _running: boolean;
     private _activePlayers: number;
 
     constructor(cardDeck: CardDeck) {
@@ -139,6 +139,7 @@ export class TheGame {
 
     start(): void {
         if (this._running) return;
+        this._running = true;
         this._cardDeck.reset();
         this._looser.resetHand();
         this._bank.resetHand();
@@ -156,6 +157,9 @@ export class TheGame {
     }
 
     private _emitUpdate(data: TheGameState): void {
+        if (data.action === 'RESULT') {
+            this._running = false;
+        }
         this._eventEmitter.emit('update', data);
     }
 
