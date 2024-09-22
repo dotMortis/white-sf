@@ -31,7 +31,6 @@
     "dependencies": {
         "@bits_devel/logger": "^5.1.1",
         "@bits_devel/process-handler": "^1",
-        "@internal/shared": "workspace:^",
         "@internal/the-game": "workspace:^",
         "express": "^4.21.0",
         "pm2": "^5",

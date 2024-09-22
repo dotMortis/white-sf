@@ -32,9 +32,6 @@ importers:
       '@bits_devel/process-handler':
         specifier: ^1
         version: 1.0.6
-      '@internal/shared':
-        specifier: workspace:^
-        version: link:../../packages/shared
       '@internal/the-game':
         specifier: workspace:^
         version: link:../../packages/the-game
@@ -84,9 +81,6 @@ importers:
 
   apps/frontend:
     dependencies:
-      '@internal/shared':
-        specifier: workspace:^
-        version: link:../../packages/shared
       '@internal/the-game':
         specifier: workspace:^
         version: link:../../packages/the-game
@@ -124,33 +118,6 @@ importers:
       vite:
         specifier: ^5.4.7
         version: 5.4.7(@types/node@20.16.5)
-      vitest:
-        specifier: ^2
-        version: 2.1.1(@types/node@20.16.5)
-
-  packages/shared:
-    devDependencies:
-      '@bits_devel/eslint-config-bits':
-        specifier: latest
-        version: 1.0.11(prettier@3.3.3)(typescript@5.6.2)
-      '@bits_devel/tsconfig':
-        specifier: latest
-        version: 1.1.1
-      '@types/node':
-        specifier: ^20
-        version: 20.16.5
-      '@vitest/coverage-v8':
-        specifier: ^2
-        version: 2.1.1(vitest@2.1.1(@types/node@20.16.5))
-      prettier:
-        specifier: ^3
-        version: 3.3.3
-      ts-node:
-        specifier: latest
-        version: 10.9.2(@types/node@20.16.5)(typescript@5.6.2)
-      typescript:
-        specifier: ^5
-        version: 5.6.2
       vitest:
         specifier: ^2
         version: 2.1.1(@types/node@20.16.5)
