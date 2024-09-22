@@ -17,15 +17,15 @@
     },
     "devDependencies": {
         "@bits_devel/eslint-config-bits": "latest",
+        "@bits_devel/logger": "^5.1.1",
         "@bits_devel/tsconfig": "latest",
         "@types/node": "^20",
-        "ts-node": "latest",
-        "prettier": "^3",
-        "typescript": "^5",
         "@vitest/coverage-v8": "^2",
+        "prettier": "^3",
+        "ts-node": "latest",
+        "typescript": "^5",
         "vitest": "^2"
     },
-    "dependencies": {},
     "files": [
         "./dist",
         "./README.md"

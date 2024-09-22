@@ -1,3 +1,4 @@
+import { BaseLogger } from '@bits_devel/logger';
 import EventEmitter from 'events';
 import { Vote } from './vote.js';
 
@@ -8,13 +9,15 @@ export type VoteState = {
 };
 
 export class VoteMaschine {
+    private readonly _logger: BaseLogger;
     private _voteDuration: number;
     private _voteRunning: NodeJS.Timeout | null;
     private _currentVote: Vote;
     private _eventEmitter: EventEmitter;
     private _runningSince: Date | null;
 
-    constructor(voteDuration: number) {
+    constructor(voteDuration: number, logger: BaseLogger) {
+        this._logger = logger;
         this._voteDuration = voteDuration;
         this._voteRunning = null;
         this._currentVote = { draw: 0, pass: 0 };
@@ -34,10 +37,18 @@ export class VoteMaschine {
     }
 
     updateVoteDuration(newDuration: number): void {
+        this._logger.debug(
+            { new: newDuration, old: this._voteDuration },
+            'VoteMaschine: Updateing vote duration'
+        );
         this._voteDuration = newDuration;
     }
 
     startVote(): void {
+        this._logger.debug(
+            { isAlreadyVoting: this._voteRunning === null },
+            'VoteMaschine: Starting vote'
+        );
         if (this._voteRunning !== null) {
             return;
         }
@@ -52,6 +63,10 @@ export class VoteMaschine {
     }
 
     stopVote(): void {
+        this._logger.debug(
+            { voteIsRunning: this._voteRunning === null },
+            'VoteMaschine: Sopping vote'
+        );
         if (this._voteRunning === null) {
             return;
         }
@@ -59,6 +74,14 @@ export class VoteMaschine {
     }
 
     voteDraw(): void {
+        this._logger.debug(
+            {
+                voteIsRunning: this._voteRunning === null,
+                currentVote: this._currentVote,
+                newVote: this._currentVote.draw + 1
+            },
+            'VoteMaschine: Vote for draw'
+        );
         if (this._voteRunning === null) {
             return;
         }
@@ -67,6 +90,14 @@ export class VoteMaschine {
     }
 
     votePass(): void {
+        this._logger.debug(
+            {
+                voteIsRunning: this._voteRunning === null,
+                currentVote: this._currentVote,
+                newVote: this._currentVote.pass + 1
+            },
+            'VoteMaschine: Vote for pass'
+        );
         if (this._voteRunning === null) {
             return;
         }
@@ -75,10 +106,12 @@ export class VoteMaschine {
     }
 
     onUpdate(listener: (voteState: VoteState) => void): void {
+        this._logger.debug('VoteMaschine: Add onUpdate listener');
         this._eventEmitter.on('update', listener);
     }
 
     removeOnUpdate(listener: (voteState: VoteState) => void): void {
+        this._logger.debug('VoteMaschine: Remove onUpdate listener');
         this._eventEmitter.removeListener('update', listener);
     }
 
@@ -87,6 +120,14 @@ export class VoteMaschine {
     }
 
     private _updateRunning(value: null | NodeJS.Timeout): void {
+        this._logger.debug(
+            {
+                newValueIsNull: value === null,
+                oldValueIsNull: this._voteRunning === null,
+                runningSince: this._runningSince
+            },
+            'VoteMaschine: Update running state'
+        );
         if (this._voteRunning !== null && value === null) {
             clearTimeout(this._voteRunning);
         }

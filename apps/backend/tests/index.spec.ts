@@ -27,7 +27,7 @@ describe('Webserver tests', () => {
                 method: 'get'
             });
             //assert
-            await expect(result.json()).resolves.toStrictEqual({ status: 'JEA' });
+            await expect(result.json()).resolves.toStrictEqual({ status: true });
         });
         test('/static should return data', async () => {
             //arrange

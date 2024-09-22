@@ -2,8 +2,45 @@
 
 ## Description
 
-![It's empty](https://media.tenor.com/T20JTqAhNBcAAAAd/travolta-empty.gif)
+Available environment variables:
 
-## Creating a new release
+| Variable              | Type                   | Default    | Description                                         |
+| --------------------- | ---------------------- | ---------- | --------------------------------------------------- |
+| LOG_LEVEL             | debug \| info \| error | debug      | Sets the log level                                  |
+| LOG_PATH              | string                 | ./log      | path to log file directory                          |
+| GMAE_MIN_PLAYERS      | number                 | 3          | required number of players to start a game          |
+| GAME_TICK_INTERVAL_MS | number                 | 2 seconds  | time until next state is calculated in milliseconds |
+| GAME_VOTING_TIME_MS   | number                 | 10 seconds | duration of votings are running in milliseconds     |
+| SERVER_PORT           | number                 | 3000       | Port the webserver is listening to                  |
 
-You can create a new version by issuing `pnpm prerelease|prepatch|preminor|premajor` for a staging release or `pnpm livepatch|liveminor|livemajor` for a live release. This will only create a git tag. To actually publish the app you need to create an Azure Pipeline or similar.
+### Starting dev env:
+
+1. install all packages
+
+```ssh
+pnpm i
+```
+
+2. start in hotreload dev mode
+
+```ssh
+npx turbo dev
+```
+
+### Building Project
+
+```ssh
+npx turbo build [--force]
+```
+
+### Generate deploy build
+
+```ssh
+npx turbo deploy
+```
+
+### Generate docker images
+
+```ssh
+pnpm docker:generate
+```

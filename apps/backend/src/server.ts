@@ -24,8 +24,7 @@ export class WebServer {
         this._server = null;
         this._port = port;
         this._baseRoute = this._sanatizeBaseUrl(baseRoute, port);
-        LOGGER.debug({ gameOptions: CONFIG.game }, 'Creating TheGame');
-        this._theGame = new TheGame(new CardDeck(STANDARD_CARDS), CONFIG.game);
+        this._theGame = new TheGame(new CardDeck(STANDARD_CARDS), LOGGER, CONFIG.game);
     }
 
     init(): void {

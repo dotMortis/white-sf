@@ -1,3 +1,4 @@
+import { BaseLogger } from '@bits_devel/logger';
 import { randomInt } from 'crypto';
 import EventEmitter from 'events';
 import { nextTick } from 'process';
@@ -23,6 +24,7 @@ export class TheGame {
     static readonly DEFAULT_TICK_INTERNVAL_MS = 2_500;
     static readonly DEFAULT_MIN_PLAYERS = 3;
 
+    private readonly _logger: BaseLogger;
     private readonly _cardDeck: CardDeck;
     private readonly _voteStack: Array<Vote>;
     private readonly _voteMaschine: VoteMaschine;
@@ -34,21 +36,25 @@ export class TheGame {
     private _activePlayers: number;
     private _currentStatus: TheGameCurrentState;
 
-    constructor(cardDeck: CardDeck, options?: Partial<TheGmaeOptions>) {
+    constructor(cardDeck: CardDeck, logger: BaseLogger, options?: Partial<TheGmaeOptions>) {
+        this._logger = logger;
         this._options = {
             minPlayers: TheGame.DEFAULT_MIN_PLAYERS,
             tickIntervalMS: TheGame.DEFAULT_TICK_INTERNVAL_MS,
             votingTimeMS: TheGame.DEFAULT_VOTNG_TIME_MS,
             ...options
         };
+        logger.debug({ options: this._options }, 'TheGame: creating');
         this._cardDeck = cardDeck;
         this._activePlayers = 0;
         this._voteStack = [];
+        logger.debug('TheGame: Creating Player "BANK"');
         this._bank = new Player('BANK');
+        logger.debug('TheGame: Creating Player "LOOSER"');
         this._looser = new Player('LOOSER');
         this._running = false;
         this._eventEmitter = new EventEmitter();
-        this._voteMaschine = new VoteMaschine(this._options.votingTimeMS);
+        this._voteMaschine = new VoteMaschine(this._options.votingTimeMS, logger);
         this._voteMaschine.onUpdate(data => this._onUpdateVote(data));
         this._currentStatus = {
             bankStatus: 'DRAW',
@@ -82,14 +88,17 @@ export class TheGame {
     }
 
     playerUp(): number {
+        this._logger.debug('TheGame: Player up');
         return ++this._activePlayers;
     }
 
     playerDown(): number {
+        this._logger.debug('TheGame: Player down');
         return this._activePlayers > 0 ? --this._activePlayers : 0;
     }
 
     playerReset(): number {
+        this._logger.debug('TheGame: Reset players');
         return (this._activePlayers = 0);
     }
 
@@ -107,6 +116,7 @@ export class TheGame {
     }
 
     start(): void {
+        this._logger.debug({ alreadyRunning: this._running }, 'TheGame: Start new game');
         if (this._running) return;
         this._running = true;
         this._cardDeck.reset();
@@ -123,10 +133,12 @@ export class TheGame {
                 },
                 ts: new Date().toISOString()
             });
-            if (this._start()) {
+            const started = this._start();
+            this._logger.debug({ started }, 'TheGame: Try starting game');
+            if (started) {
                 clearInterval(interval);
             }
-        }, 500);
+        }, 1000);
     }
 
     private _start(): boolean {
@@ -140,14 +152,17 @@ export class TheGame {
     }
 
     onUpdate(listener: (data: TheGameUpdateState) => void): void {
+        this._logger.debug('TheGame: Add on update listener');
         this._eventEmitter.on('update', listener);
     }
 
     removeOnUpdate(listener: (data: TheGameUpdateState) => void): void {
+        this._logger.debug('TheGame: Remove on update listener');
         this._eventEmitter.removeListener('update', listener);
     }
 
     private _emitUpdate(data: TheGameUpdateState): void {
+        this._logger.debug({ data }, 'TheGame: Emit update');
         if (data.action === 'RESULT') {
             this._running = false;
             this.playerReset();
@@ -157,6 +172,7 @@ export class TheGame {
     }
 
     private _setCurrentStatus(data: TheGameUpdateState): void {
+        this._logger.debug({ data }, 'TheGame: Set current status');
         if (data.action === 'WAITING') {
             this._currentStatus = {
                 data: data.data,
@@ -206,6 +222,10 @@ export class TheGame {
         const humanPoints = data.human.points;
         const bankLost = bankPoints > MAX_POINTS;
         const humanLost = humanPoints > MAX_POINTS;
+        this._logger.debug(
+            { data, bankPoints, humanPoints, bankLost, humanLost },
+            'TheGame: Calculation winner info'
+        );
         return {
             bankStatus: bankLost
                 ? 'LOST'
@@ -225,6 +245,7 @@ export class TheGame {
     }
 
     private _onUpdateVote(vote: VoteState): void {
+        this._logger.debug({ vote }, 'TheGame: On update vote');
         if (vote.status === 'DONE') {
             this._voteStack.unshift(vote.vote);
             if (vote.vote.draw > vote.vote.pass) {
@@ -251,11 +272,13 @@ export class TheGame {
     }
 
     private _playerDraw(player: Player<PlayerName>): void {
+        this._logger.debug({ name: Player.name }, 'TheGame: Player draws');
         player.addCard(this._cardDeck.draw());
         this._tick('DRAW', player);
     }
 
     private _playerPass(player: Player<PlayerName>): void {
+        this._logger.debug({ name: Player.name }, 'TheGame: Player pass');
         this._tick('PASS', player);
     }
 
@@ -264,6 +287,10 @@ export class TheGame {
         player: Player<PlayerName>,
         overrideNextTickInterval?: number
     ) {
+        this._logger.debug(
+            { from, playerName: player.name, overrideNextTickInterval },
+            'TheGame: Tick'
+        );
         const tickInterval = overrideNextTickInterval ?? this._options.tickIntervalMS;
         if (from === 'DRAW') {
             setTimeout(() => {
@@ -328,6 +355,7 @@ export class TheGame {
     }
 
     private _runNextStep(from: Extract<Action, 'DRAW' | 'PASS'>, player: Player<PlayerName>): void {
+        this._logger.debug({ from, playerName: player.name }, 'TheGame: Run next step');
         if (from === 'PASS' && player.name === 'LOOSER') {
             this._finalizeBank();
         } else if (from === 'PASS' && player.name === 'BANK') {
@@ -352,6 +380,7 @@ export class TheGame {
     }
 
     private _nextBankTurn(): void {
+        this._logger.debug('TheGame: Decide next bank turn');
         if (this._bank.points < BANK_MAX_POINTS) {
             this._playerDraw(this._bank);
         } else {
@@ -360,26 +389,32 @@ export class TheGame {
     }
 
     private _finalizeBank(): void {
+        this._logger.debug('TheGame: Finalize Bank');
         this._nextBankTurn();
     }
 
     private _finalizeGame(): void {
+        this._logger.debug('TheGame: Finalize game');
         this._tick('RESULT', this._bank);
     }
 
     private _looserLost(): void {
+        this._logger.debug('TheGame: Human lost');
         this._tick('RESULT', this._looser);
     }
 
     private _bankLost(): void {
+        this._logger.debug('TheGame: Bank lost');
         this._tick('RESULT', this._bank);
     }
 
     private _startVote(): void {
+        this._logger.debug('TheGame: Start vote');
         this._tick('VOTING', this._looser);
     }
 
     private _getDecision(): 'DRAW' | 'PASS' {
+        this._logger.debug('TheGame: Get coin decision');
         return randomInt(2) === 0 ? 'PASS' : 'DRAW';
     }
 }
