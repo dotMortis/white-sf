@@ -202,7 +202,7 @@ export class TheGame {
             return false;
         }
         nextTick(() => {
-            this._tick('DRAW', this._looser);
+            this._tick('DRAW', this._looser, 1);
         });
         return true;
     }
@@ -329,8 +329,10 @@ export class TheGame {
 
     private _tick(
         from: Extract<Action, 'DRAW' | 'PASS' | 'COIN' | 'RESULT' | 'VOTING'>,
-        player: Player<PlayerName>
+        player: Player<PlayerName>,
+        overrideNextTickInterval?: number
     ) {
+        const tickInterval = overrideNextTickInterval ?? TheGame.TICK_INTERNVAL;
         if (from === 'DRAW') {
             setTimeout(() => {
                 this._emitUpdate({
@@ -340,7 +342,7 @@ export class TheGame {
                     ts: new Date().toISOString()
                 });
                 this._runNextStep('DRAW', player);
-            }, TheGame.TICK_INTERNVAL);
+            }, tickInterval);
         } else if (from === 'PASS') {
             setTimeout(() => {
                 this._emitUpdate({
@@ -350,7 +352,7 @@ export class TheGame {
                     ts: new Date().toISOString()
                 });
                 this._runNextStep('PASS', player);
-            }, TheGame.TICK_INTERNVAL);
+            }, tickInterval);
         } else if (from === 'COIN') {
             setTimeout(() => {
                 const decision = this._getDecision();
@@ -376,8 +378,8 @@ export class TheGame {
                     } else {
                         this._playerPass(player);
                     }
-                }, TheGame.TICK_INTERNVAL);
-            }, TheGame.TICK_INTERNVAL);
+                }, tickInterval);
+            }, tickInterval);
         } else if (from === 'RESULT') {
             setTimeout(() => {
                 this._emitUpdate({
@@ -385,11 +387,11 @@ export class TheGame {
                     data: this.data,
                     ts: new Date().toISOString()
                 });
-            }, TheGame.TICK_INTERNVAL);
+            }, tickInterval);
         } else if (from === 'VOTING') {
             setTimeout(() => {
                 this._voteMaschine.startVote();
-            }, TheGame.TICK_INTERNVAL);
+            }, tickInterval);
         }
     }
 
