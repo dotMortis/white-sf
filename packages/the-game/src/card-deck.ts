@@ -1,5 +1,5 @@
 import { randomInt } from 'crypto';
-import { Card } from './card.js';
+import { Card } from './card/card.js';
 
 export class CardDeck {
     private readonly _cards: ReadonlyArray<Card>;

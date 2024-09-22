@@ -1,5 +1,5 @@
+import { MAX_POINTS } from '../global-values.js';
 import { CardSuite } from './card-suite.js';
-import { MAX_POINTS } from './global-values.js';
 
 export class Card {
     private readonly _values: readonly [number, number];

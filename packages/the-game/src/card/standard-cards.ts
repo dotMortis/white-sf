@@ -1,5 +1,5 @@
-import { CardSuiteValues } from '../card-suite.js';
-import { Card } from '../card.js';
+import { CardSuiteValues } from './card-suite.js';
+import { Card } from './card.js';
 
 const standardCardMapping: Array<[string, number, number]> = [
     ['2', 2, 2],

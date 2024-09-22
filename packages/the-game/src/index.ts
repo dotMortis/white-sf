@@ -1,102 +1,27 @@
 import { randomInt } from 'crypto';
 import EventEmitter from 'events';
 import { nextTick } from 'process';
+import { Action } from './action.js';
 import { CardDeck } from './card-deck.js';
-import { EncodedCard } from './card.js';
+import { TheGameCurrentState } from './current-state/index.js';
 import { BANK_MAX_POINTS, MAX_POINTS } from './global-values.js';
-import { Player } from './player.js';
+import { PlayerName } from './player/play-name.js';
+import { Player } from './player/player.js';
+import { TheGameUpdateState } from './update-sate/index.js';
+import { TheGameData } from './update-sate/state-data.js';
 import { VoteMaschine, VoteState } from './vote/vote-maschine.js';
 import { Vote } from './vote/vote.js';
 
-export type PlayerName = 'BANK' | 'LOOSER';
-
-export type Action = 'DRAW' | 'PASS' | 'RESULT' | 'VOTING' | 'COIN' | 'WAITING';
-
-export type CoinDecision = 'DRAW' | 'PASS' | 'PENDING';
-
-export type TheGameStateCoin = {
-    action: Extract<Action, 'COIN'>;
-    player: Extract<PlayerName, 'LOOSER'>;
-    data: {
-        decision: CoinDecision;
-    };
-    ts: string;
-};
-
-export type TheGameData = {
-    bank: {
-        cards: ReadonlyArray<EncodedCard>;
-        points: number;
-    };
-    human: {
-        activeCount: number;
-        cards: ReadonlyArray<EncodedCard>;
-        points: number;
-    };
-    votings: {
-        current: Vote;
-        past: ReadonlyArray<Vote>;
-    };
-    ts: string;
-};
-
-export type TheGameStateVoting = {
-    action: Extract<Action, 'VOTING'>;
-    player: Extract<PlayerName, 'LOOSER'>;
-    data: {
-        votings: {
-            current: Vote;
-            past: ReadonlyArray<Vote>;
-            until: string | null;
-        };
-    };
-    ts: string;
-};
-
-export type TheGameStateDefault = {
-    action: Extract<Action, 'PASS' | 'DRAW' | 'CANCEL'>;
-    player: PlayerName;
-    data: TheGameData;
-    ts: string;
-};
-
-export type TheGameStateResult = {
-    action: Extract<Action, 'RESULT'>;
-    data: TheGameData;
-    ts: string;
-};
-
-export type TheGameStateWaiting = {
-    action: Extract<Action, 'WAITING'>;
-    data: {
-        min: number;
-        current: number;
-    };
-    ts: string;
-};
-
-export type TheGameState =
-    | TheGameStateDefault
-    | TheGameStateCoin
-    | TheGameStateVoting
-    | TheGameStateResult
-    | TheGameStateWaiting;
-
-export type TheGameStatus = 'WAITING_FOR_PLAYERS' | 'RUNNING' | 'ENDING';
-export type BankStatus = 'LOST' | 'WON' | 'DRAW' | 'EVEN' | 'PASS';
-export type HumanStatus = 'EVEN' | 'LOST' | 'WON' | 'VOTING' | 'COIN' | 'DRAW' | 'PASS';
-
-export type TheGameCurrentStatus = {
-    gameStatus: TheGameStatus;
-    bankStatus: BankStatus;
-    humanStatus: HumanStatus;
-    data: TheGameState['data'];
+export type TheGmaeOptions = {
+    votingTimeMS: number;
+    tickIntervalMS: number;
+    minPlayers: number;
 };
 
 export class TheGame {
-    static readonly DEFAULT_WAITING_MS = 10_000;
-    static readonly TICK_INTERNVAL = 2_500;
-    static readonly MIN_PLAYERS = 3;
+    static readonly DEFAULT_VOTNG_TIME_MS = 10_000;
+    static readonly DEFAULT_TICK_INTERNVAL_MS = 2_500;
+    static readonly DEFAULT_MIN_PLAYERS = 3;
 
     private readonly _cardDeck: CardDeck;
     private readonly _voteStack: Array<Vote>;
@@ -104,11 +29,18 @@ export class TheGame {
     private readonly _eventEmitter: EventEmitter;
     private readonly _looser: Player<Extract<PlayerName, 'LOOSER'>>;
     private readonly _bank: Player<Extract<PlayerName, 'BANK'>>;
+    private readonly _options: Readonly<TheGmaeOptions>;
     private _running: boolean;
     private _activePlayers: number;
-    private _currentStatus: TheGameCurrentStatus;
+    private _currentStatus: TheGameCurrentState;
 
-    constructor(cardDeck: CardDeck) {
+    constructor(cardDeck: CardDeck, options?: Partial<TheGmaeOptions>) {
+        this._options = {
+            minPlayers: TheGame.DEFAULT_MIN_PLAYERS,
+            tickIntervalMS: TheGame.DEFAULT_TICK_INTERNVAL_MS,
+            votingTimeMS: TheGame.DEFAULT_VOTNG_TIME_MS,
+            ...options
+        };
         this._cardDeck = cardDeck;
         this._activePlayers = 0;
         this._voteStack = [];
@@ -116,7 +48,7 @@ export class TheGame {
         this._looser = new Player('LOOSER');
         this._running = false;
         this._eventEmitter = new EventEmitter();
-        this._voteMaschine = new VoteMaschine(TheGame.DEFAULT_WAITING_MS);
+        this._voteMaschine = new VoteMaschine(this._options.votingTimeMS);
         this._voteMaschine.onUpdate(data => this._onUpdateVote(data));
         this._currentStatus = {
             bankStatus: 'DRAW',
@@ -126,7 +58,7 @@ export class TheGame {
         };
     }
 
-    get currentStaus(): TheGameCurrentStatus {
+    get currentStaus(): TheGameCurrentState {
         return this._currentStatus;
     }
 
@@ -187,7 +119,7 @@ export class TheGame {
                 action: 'WAITING',
                 data: {
                     current: this._activePlayers,
-                    min: TheGame.MIN_PLAYERS
+                    min: this._options.minPlayers
                 },
                 ts: new Date().toISOString()
             });
@@ -198,7 +130,7 @@ export class TheGame {
     }
 
     private _start(): boolean {
-        if (this._activePlayers < TheGame.MIN_PLAYERS) {
+        if (this._activePlayers < this._options.minPlayers) {
             return false;
         }
         nextTick(() => {
@@ -207,15 +139,15 @@ export class TheGame {
         return true;
     }
 
-    onUpdate(listener: (data: TheGameState) => void): void {
+    onUpdate(listener: (data: TheGameUpdateState) => void): void {
         this._eventEmitter.on('update', listener);
     }
 
-    removeOnUpdate(listener: (data: TheGameState) => void): void {
+    removeOnUpdate(listener: (data: TheGameUpdateState) => void): void {
         this._eventEmitter.removeListener('update', listener);
     }
 
-    private _emitUpdate(data: TheGameState): void {
+    private _emitUpdate(data: TheGameUpdateState): void {
         if (data.action === 'RESULT') {
             this._running = false;
             this.playerReset();
@@ -224,7 +156,7 @@ export class TheGame {
         this._eventEmitter.emit('update', data);
     }
 
-    private _setCurrentStatus(data: TheGameState): void {
+    private _setCurrentStatus(data: TheGameUpdateState): void {
         if (data.action === 'WAITING') {
             this._currentStatus = {
                 data: data.data,
@@ -269,7 +201,7 @@ export class TheGame {
         }
     }
 
-    private _getWinnerInfo(data: TheGameData): Omit<TheGameCurrentStatus, 'data' | 'gameStatus'> {
+    private _getWinnerInfo(data: TheGameData): Omit<TheGameCurrentState, 'data' | 'gameStatus'> {
         const bankPoints = data.bank.points;
         const humanPoints = data.human.points;
         const bankLost = bankPoints > MAX_POINTS;
@@ -332,7 +264,7 @@ export class TheGame {
         player: Player<PlayerName>,
         overrideNextTickInterval?: number
     ) {
-        const tickInterval = overrideNextTickInterval ?? TheGame.TICK_INTERNVAL;
+        const tickInterval = overrideNextTickInterval ?? this._options.tickIntervalMS;
         if (from === 'DRAW') {
             setTimeout(() => {
                 this._emitUpdate({
