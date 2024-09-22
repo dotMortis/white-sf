@@ -12,6 +12,7 @@ Available environment variables:
 | GAME_TICK_INTERVAL_MS | number                 | 2 seconds  | time until next state is calculated in milliseconds |
 | GAME_VOTING_TIME_MS   | number                 | 10 seconds | duration of votings are running in milliseconds     |
 | SERVER_PORT           | number                 | 3000       | Port the webserver is listening to                  |
+| SERVER_BASE_PATH      | string                 | localhost  | Server dns name                                     |
 
 ### Starting dev env:
 
