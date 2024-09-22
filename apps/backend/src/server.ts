@@ -5,8 +5,10 @@ import express, { Application } from 'express';
 import { Server } from 'http';
 import { resolve } from 'path';
 import { WebSocketServer } from 'ws';
+import { CONFIG } from './config.js';
 import { ErrorHandler } from './middleware/error-handler.js';
-import { TELEFON_ROUTER } from './routes/telefon.routes.js';
+import { TELEPHONE_ROUTER } from './routes/telephone.routes.js';
+import { LOGGER } from './utils/logger.js';
 
 export class WebServer {
     private readonly _expressApp: Application;
@@ -22,7 +24,8 @@ export class WebServer {
         this._server = null;
         this._port = port;
         this._baseRoute = this._sanatizeBaseUrl(baseRoute, port);
-        this._theGame = new TheGame(new CardDeck(STANDARD_CARDS));
+        LOGGER.debug({ gameOptions: CONFIG.game }, 'Creating TheGame');
+        this._theGame = new TheGame(new CardDeck(STANDARD_CARDS), CONFIG.game);
     }
 
     init(): void {
@@ -31,7 +34,7 @@ export class WebServer {
             '/static',
             express.static(resolve(import.meta.dirname, '..', 'assets'))
         );
-        this._expressApp.use(TELEFON_ROUTER(this._theGame));
+        this._expressApp.use(TELEPHONE_ROUTER(this._theGame));
         this._expressApp.use(ErrorHandler);
     }
 
@@ -51,9 +54,12 @@ export class WebServer {
 
     stop(): Promise<void> {
         return new Promise<void>((res, rej) => {
+            LOGGER.debug('Closing all websocket connections');
             this._wss.clients.forEach(client => client.close());
             if (this._server !== null) {
+                LOGGER.debug('Closing all http connections');
                 this._server.closeAllConnections();
+                LOGGER.debug('Closing http server');
                 this._server.close((err?: Error) => {
                     if (err != null) {
                         rej(err);
@@ -72,11 +78,13 @@ export class WebServer {
         server.on('upgrade', (request, socket, head) => {
             this._wss.handleUpgrade(request, socket, head, socket => {
                 const { pathname } = new URL(request.url ?? '', `ws://${this._baseRoute}`);
-
+                LOGGER.debug({ url: request.url }, 'New socket connection');
                 if (pathname === '/whitefs') {
                     socket.on('message', data => {
                         const dataStr = String(data);
+                        LOGGER.debug({ message: dataStr }, 'New socket message');
                         if (dataStr === 'ping') {
+                            LOGGER.debug('Sending ping to socket client');
                             socket.send('pong');
                         }
                     });

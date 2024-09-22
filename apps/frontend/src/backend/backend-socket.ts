@@ -85,7 +85,6 @@ export class BackendSocket extends EventEmitter<BackendSocketEvents> {
 
     private _onMessage(message: string): void {
         console.log('MESSAGE', message);
-
         try {
             const event = JSON.parse(message);
             if ('action' in event && 'data' in event) {

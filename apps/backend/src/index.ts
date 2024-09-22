@@ -1,21 +1,24 @@
 import { initProcessHanlder, processHandler } from '@bits_devel/process-handler';
+import { CONFIG } from './config.js';
 import { WebServer } from './server.js';
+import { LOGGER } from './utils/logger.js';
 
 const start = () => {
     let server: WebServer | null = null;
     initProcessHanlder();
     const ph = processHandler();
     ph.onStart(async () => {
-        console.log('STARTING SERVER');
-        server = new WebServer('localhost', 3000);
+        LOGGER.info({ config: CONFIG }, 'Initialize server');
+        server = new WebServer(CONFIG.basePath, CONFIG.port);
         server.init();
+        LOGGER.info('Starting server');
         await server.start();
-        console.log('STARTED SERVER');
+        LOGGER.info('Server started successfully');
     });
     ph.addExitMiddleware(async () => {
-        console.log('STOPPING SERVER');
+        LOGGER.info('Stopping server');
         await server?.stop();
-        console.log('STOPPED SERVER');
+        LOGGER.info('Stopped server');
     });
     ph.gracefulStart();
 };
