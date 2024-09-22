@@ -1,4 +1,4 @@
-import { Card, EncodedCard } from './card.js';
+import { Card, EncodedCard } from '../card/card.js';
 
 export class Player<NAME extends string = string> {
     private readonly _name: NAME;

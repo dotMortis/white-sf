@@ -380,6 +380,6 @@ export class TheGame {
     }
 
     private _getDecision(): 'DRAW' | 'PASS' {
-        return randomInt(0, 1) === 0 ? 'PASS' : 'DRAW';
+        return randomInt(2) === 0 ? 'PASS' : 'DRAW';
     }
 }

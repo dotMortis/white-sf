@@ -4,6 +4,7 @@
     "license": "UNLICENSED",
     "scripts": {
         "build": "rm -rf dist/ && tsc -p ./tsconfig.build.json",
+        "dev": "tsc -p ./tsconfig.build.json --watch",
         "build:watch": "pnpm build --watch",
         "typecheck": "tsc -p ./tsconfig.build.json --noEmit",
         "typecheck:watch": "pnpm typecheck --watch",
@@ -30,21 +31,45 @@
         "./README.md"
     ],
     "exports": {
+        "./action": {
+            "types": "./src/action.ts",
+            "default": "./dist/action.js"
+        },
+        "./card-suite": {
+            "types": "./src/card/card-suite.ts",
+            "default": "./dist/card/card-suite.js"
+        },
+        "./card": {
+            "types": "./src/card/card.ts",
+            "default": "./dist/card/card.js"
+        },
+        "./standard-cards": {
+            "types": "./src/card/standard-cards.ts",
+            "default": "./dist/card/standard-cards.js"
+        },
         "./card-deck": {
             "types": "./src/card-deck.ts",
             "default": "./dist/card-deck.js"
         },
-        "./card-suite": {
-            "types": "./src/card-suite.ts",
-            "default": "./dist/card-suite.js"
+        "./coin-state": {
+            "types": "./src/coin-state.ts",
+            "default": "./dist/coin-state.js"
         },
-        "./card": {
-            "types": "./src/card.ts",
-            "default": "./dist/card.js"
+        "./bank-status": {
+            "types": "./src/current-state/bank-status.ts",
+            "default": "./dist/current-state/bank-status.js"
         },
-        "./standard-cards": {
-            "types": "./src/cards/standard-cards.ts",
-            "default": "./dist/cards/standard-cards.js"
+        "./game-status": {
+            "types": "./src/current-state/game-status.ts",
+            "default": "./dist/current-state/game-status.js"
+        },
+        "./human-status": {
+            "types": "./src/current-state/human-status.ts",
+            "default": "./dist/current-state/human-status.js"
+        },
+        "./current-state": {
+            "types": "./src/current-state/index.ts",
+            "default": "./dist/current-state/index.js"
         },
         "./global-values": {
             "types": "./src/global-values.ts",
@@ -54,9 +79,41 @@
             "types": "./src/index.ts",
             "default": "./dist/index.js"
         },
+        "./play-name": {
+            "types": "./src/player/play-name.ts",
+            "default": "./dist/player/play-name.js"
+        },
         "./player": {
-            "types": "./src/player.ts",
-            "default": "./dist/player.js"
+            "types": "./src/player/player.ts",
+            "default": "./dist/player/player.js"
+        },
+        "./update-sate": {
+            "types": "./src/update-sate/index.ts",
+            "default": "./dist/update-sate/index.js"
+        },
+        "./state-coin": {
+            "types": "./src/update-sate/state-coin.ts",
+            "default": "./dist/update-sate/state-coin.js"
+        },
+        "./state-data": {
+            "types": "./src/update-sate/state-data.ts",
+            "default": "./dist/update-sate/state-data.js"
+        },
+        "./state-default": {
+            "types": "./src/update-sate/state-default.ts",
+            "default": "./dist/update-sate/state-default.js"
+        },
+        "./state-result": {
+            "types": "./src/update-sate/state-result.ts",
+            "default": "./dist/update-sate/state-result.js"
+        },
+        "./state-voting": {
+            "types": "./src/update-sate/state-voting.ts",
+            "default": "./dist/update-sate/state-voting.js"
+        },
+        "./state-waiting": {
+            "types": "./src/update-sate/state-waiting.ts",
+            "default": "./dist/update-sate/state-waiting.js"
         },
         "./vote-maschine": {
             "types": "./src/vote/vote-maschine.ts",

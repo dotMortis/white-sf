@@ -22,6 +22,6 @@ export class CardDeck {
     }
 
     private _randomIndex(): number {
-        return randomInt(0, this._currentDeck.length - 1);
+        return randomInt(this._currentDeck.length);
     }
 }

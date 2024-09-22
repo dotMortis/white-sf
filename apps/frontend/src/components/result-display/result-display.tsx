@@ -1,4 +1,4 @@
-import { PlayerName } from '@internal/the-game';
+import { PlayerName } from '@internal/the-game/play-name';
 import './result-display.css';
 
 export type ResultDisplayProperties = {

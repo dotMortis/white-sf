@@ -1,16 +1,16 @@
-import { CoinDecision } from '@internal/the-game';
+import { CoinState } from '@internal/the-game/coin-state';
 import { ServerUrl } from '../../index.js';
 import './coin-flip.css';
 
 export type CoinFlipProperties = {
-    decision: CoinDecision;
+    decision: CoinState;
 };
 
 const DecisionImage = {
     DRAW: 'yugioh/coin-draw.png',
     PASS: 'yugioh/coin-pass.png',
     PENDING: 'yugioh/coin-running.png'
-} satisfies Record<CoinDecision, string>;
+} satisfies Record<CoinState, string>;
 
 export const CoinFlip = (properties: CoinFlipProperties) => {
     const { decision } = properties;

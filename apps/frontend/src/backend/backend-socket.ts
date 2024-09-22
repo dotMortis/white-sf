@@ -1,6 +1,9 @@
-import { CoinDecision, PlayerName, TheGameData, TheGameState } from '@internal/the-game';
 import { EncodedCard } from '@internal/the-game/card';
+import { CoinState } from '@internal/the-game/coin-state';
 import { MAX_POINTS } from '@internal/the-game/global-values';
+import { PlayerName } from '@internal/the-game/play-name';
+import { TheGameData } from '@internal/the-game/state-data';
+import { TheGameUpdateState } from '@internal/the-game/update-sate';
 import { EventEmitter } from '../util/event-emitter.js';
 
 export type BackendSocketEvents = {
@@ -12,7 +15,7 @@ export type BackendSocketEvents = {
         playerScore: number
     ) => void;
     vote: (drawVotes: number, passVotes: number, until: number) => void;
-    coin: (decision: CoinDecision) => void;
+    coin: (decision: CoinState) => void;
     result: (winner: PlayerName | 'DRAW') => void;
     waiting: (players: number, minimum: number) => void;
 };
@@ -96,7 +99,7 @@ export class BackendSocket extends EventEmitter<BackendSocketEvents> {
         }
     }
 
-    private _processEvent(event: TheGameState): void {
+    private _processEvent(event: TheGameUpdateState): void {
         const timestamp = new Date(event.ts).getTime();
         if (timestamp < this._lastTimestamp) {
             return;

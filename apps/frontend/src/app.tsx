@@ -1,5 +1,6 @@
-import { CoinDecision, PlayerName } from '@internal/the-game';
 import { EncodedCard } from '@internal/the-game/card';
+import { CoinState } from '@internal/the-game/coin-state';
+import { PlayerName } from '@internal/the-game/play-name';
 import { useEffect, useState } from 'preact/hooks';
 import './app.css';
 import { BackendSocketEvents } from './backend/backend-socket.js';
@@ -24,7 +25,7 @@ export const App = () => {
     const [votes, setVotes] = useState<readonly [draw: number, pass: number, until: number] | null>(
         null
     );
-    const [decision, setDecision] = useState<CoinDecision | null>(null);
+    const [decision, setDecision] = useState<CoinState | null>(null);
     const [winner, setWinner] = useState<PlayerName | 'DRAW' | null>(null);
     const [playerCount, setPlayerCount] = useState<
         readonly [current: number, required: number] | null
