@@ -2,11 +2,11 @@ services:
     backend:
         image: whitesf-backend
         environment:
-            LOG_LEVEL: 'info'
+            LOG_LEVEL: 'debug'
             LOG_PATH: '/var/log/white_sf/'
-            GAME_MIN_PLAYERS: '1'
-            GAME_TICK_INTERVAL_MS: '500'
-            GAME_VOTING_TIME_MS: '1000'
+            GAME_MIN_PLAYERS: '4'
+            GAME_TICK_INTERVAL_MS: '2500'
+            GAME_VOTING_TIME_MS: '10000'
             SERVER_PORT: '3000'
             SERVER_BASE_PATH: 'localhost'
         volumes:
