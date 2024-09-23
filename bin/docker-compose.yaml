@@ -9,10 +9,13 @@ services:
             GAME_VOTING_TIME_MS: '10000'
             SERVER_PORT: '3000'
             SERVER_BASE_PATH: 'localhost'
+            FRONTEND_URL: 'http://localhost:3001'
         volumes:
             - /var/log/whitesf/:/var/log
         ports:
             - '3000:3000'
+        stdin_open: true
+        tty: true
 
     frontend:
         image: whitesf-frontend

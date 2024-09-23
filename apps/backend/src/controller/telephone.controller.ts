@@ -143,7 +143,7 @@ export class TelephoneController {
             }
         };
     }
-
+    //155 Resolution , adjust for telephone res
     imageHandler(): ApiRequestHandler<ApiParams, any, ApiRequestBody, InputFromStarfacePbx> {
         return async (req, res, next) => {
             try {
