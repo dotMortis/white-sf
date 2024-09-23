@@ -124,6 +124,7 @@ export class TheGame {
         this._bank.resetHand();
         this._looser.addCard(this._cardDeck.draw());
         this._bank.addCard(this._cardDeck.draw());
+        this._voteStack.length = 0;
         const interval = setInterval(() => {
             this._emitUpdate({
                 action: 'WAITING',
