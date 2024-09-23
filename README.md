@@ -40,8 +40,15 @@ npx turbo build [--force]
 npx turbo deploy
 ```
 
-### Generate docker images
+### Generate docker images(generates both back- and frontend)
 
 ```ssh
 pnpm docker:generate
+```
+
+### Commands to generate single docker Image
+
+```ssh
+pnpm docker-generate-backend
+pnpm docker-generate-frontend
 ```

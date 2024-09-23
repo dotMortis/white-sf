@@ -1,5 +1,5 @@
 .coin-flip {
-    --yugi-size: 50%;
+    --yugi-size: 60%;
     --bar-height: 30%;
 
     display: flex;
@@ -17,8 +17,6 @@
     justify-content: flex-end;
     align-items: flex-end;
 
-    color: white;
-
     padding: 2em 4em;
 
     width: 100%;
@@ -31,11 +29,15 @@
     box-sizing: border-box;
 }
 
+.coin-text {
+    position: relative;
+    color: white;
+}
+
 .coin-flip > .center {
     display: flex;
     justify-content: center;
     align-items: center;
-
     position: absolute;
     top: 0;
     bottom: 0;
@@ -44,10 +46,11 @@
 }
 
 .coin-flip > .center > .yugi {
-    width: var(--yugi-size);
+    width: 35%;
     height: var(--yugi-size);
-
+    position: relative;
     background-repeat: no-repeat;
-    background-size: cover;
+    background-size: contain;
     background-position: center center;
+    top: -7.5%;
 }

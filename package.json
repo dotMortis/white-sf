@@ -6,7 +6,12 @@
     },
     "scripts": {
         "turbo": "FORCE_COLOR=1 turbo run",
-        "docker:generate": "npx turbo deploy && /bin/bash ./bin/create-backend-docker.sh"
+        "docker:generate-backend": "npx turbo deploy && /bin/bash ./bin/create-backend-docker.sh",
+        "docker:generate-frontend": "npx turbo deploy && /bin/bash ./bin/create-frontend-docker.sh",
+        "docker:generate": "pnpm docker:generate-backend && pnpm docker:generate-frontend",
+        "docker:run-backend": "docker run -d -p 3000:3000 whitesf-backend",
+        "docker:run-frontend": "docker run -d -p 3001:80 whitesf-frontend",
+        "docker:run": "pnpm docker:run-backend && pnpm docker:run-frontend"
     },
     "devDependencies": {
         "@bits_devel/tsconfig": "^1.1.1",

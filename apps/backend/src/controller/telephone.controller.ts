@@ -127,6 +127,10 @@ export class TelephoneController {
                     this.stateHandler()(req, res, next);
                     break;
                 }
+                case 'START': {
+                    this.startGameHandler()(req, res, next);
+                    break;
+                }
                 default: {
                     next(new Error(`Action "${req.query.action}" is not implmented`));
                     break;

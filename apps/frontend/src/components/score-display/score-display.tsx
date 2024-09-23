@@ -12,16 +12,12 @@ export const ScoreDisplay = (properties: ScoreDisplayProperties) => {
         <div className='score-display'>
             <div className='panel'>
                 <div className='row'>
-                    <div className='icon'>
-                        <img src={`${ServerUrl}/static/yugioh/bank.png`}></img>
-                    </div>
+                    <img class='icon-bank' src={`${ServerUrl}/static/yugioh/bank.png`}></img>
                     <span className='dealer score'>{dealerScore.toFixed(0)}</span>
                 </div>
                 <div className='separator'></div>
                 <div className='row'>
-                    <div className='icon'>
-                        <img src={`${ServerUrl}/static/yugioh/human.png`}></img>
-                    </div>
+                    <img class='icon-player' src={`${ServerUrl}/static/yugioh/human.png`}></img>
                     <span className='player score'>{playerScore.toFixed(0)}</span>
                 </div>
             </div>

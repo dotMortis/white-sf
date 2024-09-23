@@ -1,0 +1,11 @@
+#This is a comment
+
+#use lightweight debian os
+FROM nginx
+
+#COPY SOURCE DESTINATION
+#COPY Server into /whitesf
+COPY ./apps/frontend/dist /usr/share/nginx/html
+
+#START server
+#EXPOSE 80

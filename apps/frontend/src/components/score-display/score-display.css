@@ -28,12 +28,16 @@
     color: white;
 }
 
-.score-display .icon {
-    width: 96px;
-
-    background-color: white;
-
-    border-radius: 50%;
+.score-display {
+    .icon-bank {
+        width: 96px;
+        border-radius: 50%;
+    }
+    .icon-player {
+        width: 80px;
+        border-radius: 50%;
+        box-shadow: 0 0 1px 0.5px white;
+    }
 }
 
 .score-display img {
