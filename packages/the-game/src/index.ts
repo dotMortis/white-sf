@@ -147,7 +147,7 @@ export class TheGame {
             return false;
         }
         nextTick(() => {
-            this._tick('DRAW', this._looser, 1);
+            this._tick('DRAW', this._looser);
         });
         return true;
     }
@@ -248,14 +248,16 @@ export class TheGame {
     private _onUpdateVote(vote: VoteState): void {
         this._logger.debug({ vote }, 'TheGame: On update vote');
         if (vote.status === 'DONE') {
-            this._voteStack.unshift(vote.vote);
-            if (vote.vote.draw > vote.vote.pass) {
-                this._playerDraw(this._looser);
-            } else if (vote.vote.pass > vote.vote.draw) {
-                this._playerPass(this._looser);
-            } else {
-                this._tick('COIN', this._looser);
-            }
+            setTimeout(() => {
+                this._voteStack.unshift(vote.vote);
+                if (vote.vote.draw > vote.vote.pass) {
+                    this._playerDraw(this._looser);
+                } else if (vote.vote.pass > vote.vote.draw) {
+                    this._playerPass(this._looser);
+                } else {
+                    this._tick('COIN', this._looser);
+                }
+            }, 1500);
         } else {
             this._emitUpdate({
                 action: 'VOTING',
@@ -285,54 +287,50 @@ export class TheGame {
 
     private _tick(
         from: Extract<Action, 'DRAW' | 'PASS' | 'COIN' | 'RESULT' | 'VOTING'>,
-        player: Player<PlayerName>,
-        overrideNextTickInterval?: number
+        player: Player<PlayerName>
     ) {
-        this._logger.debug(
-            { from, playerName: player.name, overrideNextTickInterval },
-            'TheGame: Tick'
-        );
-        const tickInterval = overrideNextTickInterval ?? this._options.tickIntervalMS;
+        this._logger.debug({ from, playerName: player.name }, 'TheGame: Tick');
+        const tickInterval = this._options.tickIntervalMS;
         if (from === 'DRAW') {
+            this._emitUpdate({
+                action: 'DRAW',
+                player: player.name,
+                data: this.data,
+                ts: new Date().toISOString()
+            });
             setTimeout(() => {
-                this._emitUpdate({
-                    action: 'DRAW',
-                    player: player.name,
-                    data: this.data,
-                    ts: new Date().toISOString()
-                });
                 this._runNextStep('DRAW', player);
             }, tickInterval);
         } else if (from === 'PASS') {
+            this._emitUpdate({
+                action: 'PASS',
+                player: player.name,
+                data: this.data,
+                ts: new Date().toISOString()
+            });
             setTimeout(() => {
-                this._emitUpdate({
-                    action: 'PASS',
-                    player: player.name,
-                    data: this.data,
-                    ts: new Date().toISOString()
-                });
                 this._runNextStep('PASS', player);
             }, tickInterval);
         } else if (from === 'COIN') {
+            this._emitUpdate({
+                action: 'COIN',
+                player: 'LOOSER',
+                data: {
+                    decision: 'PENDING'
+                },
+                ts: new Date().toISOString()
+            });
             setTimeout(() => {
                 const decision = this._getDecision();
                 this._emitUpdate({
                     action: 'COIN',
                     player: 'LOOSER',
                     data: {
-                        decision: 'PENDING'
+                        decision
                     },
                     ts: new Date().toISOString()
                 });
                 setTimeout(() => {
-                    this._emitUpdate({
-                        action: 'COIN',
-                        player: 'LOOSER',
-                        data: {
-                            decision
-                        },
-                        ts: new Date().toISOString()
-                    });
                     if (decision === 'DRAW') {
                         this._playerDraw(player);
                     } else {
@@ -341,17 +339,13 @@ export class TheGame {
                 }, tickInterval);
             }, tickInterval);
         } else if (from === 'RESULT') {
-            setTimeout(() => {
-                this._emitUpdate({
-                    action: 'RESULT',
-                    data: this.data,
-                    ts: new Date().toISOString()
-                });
-            }, tickInterval);
+            this._emitUpdate({
+                action: 'RESULT',
+                data: this.data,
+                ts: new Date().toISOString()
+            });
         } else if (from === 'VOTING') {
-            setTimeout(() => {
-                this._voteMaschine.startVote();
-            }, tickInterval);
+            this._voteMaschine.startVote();
         }
     }
 
