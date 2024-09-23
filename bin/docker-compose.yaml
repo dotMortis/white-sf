@@ -1,0 +1,20 @@
+services:
+    backend:
+        image: whitesf-backend
+        environment:
+            LOG_LEVEL: 'info'
+            LOG_PATH: '/var/log/white_sf/'
+            GAME_MIN_PLAYERS: '1'
+            GAME_TICK_INTERVAL_MS: '500'
+            GAME_VOTING_TIME_MS: '1000'
+            SERVER_PORT: '3000'
+            SERVER_BASE_PATH: 'localhost'
+        volumes:
+            - /var/log/whitesf/:/var/log
+        ports:
+            - '3000:3000'
+
+    frontend:
+        image: whitesf-frontend
+        ports:
+            - '3001:80'

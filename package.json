@@ -11,7 +11,10 @@
         "docker:generate": "pnpm docker:generate-backend && pnpm docker:generate-frontend",
         "docker:run-backend": "docker run -d -p 3000:3000 whitesf-backend",
         "docker:run-frontend": "docker run -d -p 3001:80 whitesf-frontend",
-        "docker:run": "pnpm docker:run-backend && pnpm docker:run-frontend"
+        "docker:run": "pnpm docker:run-backend && pnpm docker:run-frontend",
+        "docker:compose:up": "docker compose -f bin/docker-compose.yaml up -d",
+        "docker:compose:down": "docker compose -f bin/docker-compose.yaml down",
+        "server:generate:start": "pnpm  docker:generate && pnpm docker:compose:up"
     },
     "devDependencies": {
         "@bits_devel/tsconfig": "^1.1.1",

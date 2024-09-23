@@ -11,9 +11,9 @@ export type ApiLocal = Record<string, unknown>;
 export type ApiParams = Record<string, unknown>;
 
 export type ApiRequestHandler<
-    Params = ApiParams,
-    ResBody = ApiReponseBody,
-    ReqBody = ApiRequestBody,
-    ReqQuery = ApiReqQury,
+    UrlParams = ApiParams,
+    ResponseBody = ApiReponseBody,
+    RequestBody = ApiRequestBody,
+    RequestQueryParams = ApiReqQury,
     Locals extends Record<string, unknown> = ApiLocal
-> = RequestHandler<Params, ResBody, ReqBody, ReqQuery, Locals>;
+> = RequestHandler<UrlParams, ResponseBody, RequestBody, RequestQueryParams, Locals>;
