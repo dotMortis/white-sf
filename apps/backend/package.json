@@ -34,6 +34,7 @@
         "@internal/the-game": "workspace:^",
         "express": "^4.21.0",
         "pm2": "^5",
+        "puppeteer": "^23.4.0",
         "ws": "^8.18.0"
     },
     "devDependencies": {

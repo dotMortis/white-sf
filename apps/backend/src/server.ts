@@ -3,7 +3,6 @@ import { CardDeck } from '@internal/the-game/card-deck';
 import { STANDARD_CARDS } from '@internal/the-game/standard-cards';
 import express, { Application } from 'express';
 import { Server } from 'http';
-import { resolve } from 'path';
 import { WebSocketServer } from 'ws';
 import { CONFIG } from './config.js';
 import { ErrorHandler } from './middleware/error-handler.js';
@@ -29,10 +28,7 @@ export class WebServer {
 
     init(): void {
         this._expressApp.use(express.json());
-        this._expressApp.use(
-            '/static',
-            express.static(resolve(import.meta.dirname, '..', 'assets'))
-        );
+        this._expressApp.use('/static', express.static(CONFIG.assetPath));
         this._expressApp.use(TELEPHONE_ROUTER(this._theGame));
         this._expressApp.use(ErrorHandler);
     }
@@ -78,6 +74,10 @@ export class WebServer {
             this._wss.handleUpgrade(request, socket, head, socket => {
                 const { pathname } = new URL(request.url ?? '', `ws://${this._baseRoute}`);
                 LOGGER.debug({ url: request.url }, 'New socket connection');
+                const state = this._theGame.theGameUpdateState;
+                if (state !== null) {
+                    socket.send(JSON.stringify(state));
+                }
                 if (pathname === '/whitefs') {
                     socket.on('message', data => {
                         const dataStr = String(data);

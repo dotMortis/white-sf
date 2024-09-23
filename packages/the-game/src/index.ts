@@ -35,6 +35,7 @@ export class TheGame {
     private _running: boolean;
     private _activePlayers: number;
     private _currentStatus: TheGameCurrentState;
+    private _theGameUpdateState: TheGameUpdateState | null;
 
     constructor(cardDeck: CardDeck, logger: BaseLogger, options?: Partial<TheGmaeOptions>) {
         this._logger = logger;
@@ -46,6 +47,7 @@ export class TheGame {
         };
         logger.debug({ options: this._options }, 'TheGame: creating');
         this._cardDeck = cardDeck;
+        this._theGameUpdateState = null;
         this._activePlayers = 0;
         this._voteStack = [];
         logger.debug('TheGame: Creating Player "BANK"');
@@ -85,6 +87,10 @@ export class TheGame {
             },
             ts: new Date().toISOString()
         };
+    }
+
+    get theGameUpdateState(): TheGameUpdateState | null {
+        return this._theGameUpdateState;
     }
 
     playerUp(): number {
@@ -169,6 +175,7 @@ export class TheGame {
             this.playerReset();
         }
         this._setCurrentStatus(data);
+        this._theGameUpdateState = data;
         this._eventEmitter.emit('update', data);
     }
 
