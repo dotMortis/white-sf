@@ -15,6 +15,8 @@ export function TELEPHONE_ROUTER(theGame: TheGame) {
     TELEFON_ROUTER.route('/pass').get(controller.votePassHandler());
     TELEFON_ROUTER.route('/draw').get(controller.voteDrawHandler());
     TELEFON_ROUTER.route('/state').get(controller.stateHandler());
+    TELEFON_ROUTER.route('/statefrom').get(controller.stateFromHandler());
+    TELEFON_ROUTER.route('/stop').get(controller.stopHandler());
     TELEFON_ROUTER.route('/action').get(controller.actionHandler());
     TELEFON_ROUTER.route('/image').get(controller.imageHandler());
     return TELEFON_ROUTER;

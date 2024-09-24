@@ -20,6 +20,7 @@
         "@bits_devel/logger": "^5.1.1",
         "@bits_devel/tsconfig": "latest",
         "@types/node": "^20",
+        "@types/uuid": "^10.0.0",
         "@vitest/coverage-v8": "^2",
         "prettier": "^3",
         "ts-node": "latest",
@@ -126,5 +127,8 @@
         "./package.json": "./package.json"
     },
     "name": "@internal/the-game",
-    "private": true
+    "private": true,
+    "dependencies": {
+        "uuid": "^10.0.0"
+    }
 }
