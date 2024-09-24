@@ -1,23 +1,20 @@
 services:
+    frontend:
+        image: whitesf-frontend
+        ports:
+            - '3001:80'
+
     backend:
         image: whitesf-backend
         environment:
             LOG_LEVEL: 'debug'
-            LOG_PATH: '/var/log/white_sf/'
+            LOG_PATH: '/home/node/app/backend/logs'
             GAME_MIN_PLAYERS: '4'
             GAME_TICK_INTERVAL_MS: '2500'
             GAME_VOTING_TIME_MS: '10000'
             SERVER_PORT: '3000'
             SERVER_BASE_PATH: 'localhost'
-            FRONTEND_URL: 'http://localhost:3001'
-        volumes:
-            - /var/log/whitesf/:/var/log
+            FRONTEND_URL: 'http://frontend:80'
+
         ports:
             - '3000:3000'
-        stdin_open: true
-        tty: true
-
-    frontend:
-        image: whitesf-frontend
-        ports:
-            - '3001:80'

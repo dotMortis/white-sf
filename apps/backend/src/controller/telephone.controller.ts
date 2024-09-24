@@ -10,11 +10,13 @@ import { LOGGER } from '../utils/logger.js';
 
 export class TelephoneController {
     private readonly _theGame: TheGame;
-    private readonly _pup: Promise<puppeteer.Browser>;
+    private _page: puppeteer.Page | null;
+    private _pup: puppeteer.Browser | null;
 
     constructor(theGame: TheGame) {
         this._theGame = theGame;
-        this._pup = puppeteer.launch({ headless: true });
+        this._page = null;
+        this._pup = null;
     }
 
     registerHandler(): ApiRequestHandler<
@@ -49,10 +51,23 @@ export class TelephoneController {
         ApiRequestBody,
         InputFromStarfacePbx
     > {
-        return (req, res, next) => {
-            LOGGER.debug({ query: req.query, route: req.route }, 'Start game');
-            this._theGame.start();
-            res.status(200).json({ status: true });
+        return async (req, res, next) => {
+            try {
+                LOGGER.debug({ query: req.query, route: req.route }, 'Start game');
+                if (!this._theGame.running) {
+                    this._pup ??= await puppeteer.launch({
+                        headless: true,
+                        args: ['--no-sandbox']
+                    });
+                    this._page ??= await this._pup.newPage();
+                    await this._page.setViewport({ width: 1920 / 2, height: 1080 / 2 });
+                    await this._page.goto(CONFIG.frontendUrl);
+                }
+                this._theGame.start();
+                res.status(200).json({ status: true });
+            } catch (error) {
+                next(error);
+            }
         };
     }
 
@@ -148,13 +163,12 @@ export class TelephoneController {
         return async (req, res, next) => {
             try {
                 LOGGER.debug({ query: req.query, route: req.route }, 'Game image');
-
-                const browser = await this._pup;
                 const imgPath = join(CONFIG.assetPath, 'game.png');
-                const page = await browser.newPage();
-                await page.setViewport({ width: 1920 / 2, height: 1080 / 2 });
-                await page.goto(CONFIG.frontendUrl);
-                await page.screenshot({ path: imgPath, optimizeForSpeed: true, type: 'jpeg' });
+                await this._page?.screenshot({
+                    path: imgPath,
+                    optimizeForSpeed: true,
+                    type: 'jpeg'
+                });
                 res.status(200).sendFile(imgPath);
             } catch (error) {
                 next(error);

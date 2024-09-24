@@ -3,9 +3,17 @@
 #use lightweight debian os
 FROM node:20-bullseye
 
+RUN apt-get update && apt-get install gnupg wget -y 
+RUN wget --quiet --output-document=- https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /etc/apt/trusted.gpg.d/google-archive.gpg
+RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+RUN apt-get update -y
+RUN apt-get install google-chrome-stable -y --no-install-recommends
+RUN rm -rf /var/lib/apt/lists/*
+
+
 
 WORKDIR /home/node/app
-RUN su node
+RUN cd /home/node/app
 
 #COPY SOURCE DESTINATION
 #COPY Server into /whitesf
@@ -16,11 +24,12 @@ RUN ["tar","-xf","backend.tar.gz"]
 
 # COPY assets into proj
 COPY ./apps/backend/assets backend/assets
+RUN chown -R node:node backend
 
-
+USER node
 WORKDIR /home/node/app/backend
 RUN cd /home/node/app/backend
-
+RUN npx puppeteer browsers install chrome
 #START server
 EXPOSE 3000
 

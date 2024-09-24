@@ -66,6 +66,10 @@ export class TheGame {
         };
     }
 
+    get running(): boolean {
+        return this._running;
+    }
+
     get currentStaus(): TheGameCurrentState {
         return this._currentStatus;
     }

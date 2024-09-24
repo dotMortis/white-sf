@@ -6,6 +6,7 @@ import { LOGGER } from '../utils/logger.js';
 export function TELEPHONE_ROUTER(theGame: TheGame) {
     LOGGER.debug('Creating telephone router');
     const TELEFON_ROUTER = Router({ mergeParams: true });
+
     const controller = new TelephoneController(theGame);
 
     TELEFON_ROUTER.route('/register').get(controller.registerHandler());
