@@ -51,9 +51,9 @@ export class TelephoneController {
         ApiRequestBody,
         InputFromStarfacePbx
     > {
-        return (req, res, next) => {
+        return async (req, res, next) => {
             LOGGER.debug({ query: req.query, route: req.route }, 'Stop');
-            this._theGame.stop();
+            await this._theGame.stop();
             res.status(200).json({ status: true });
         };
     }
