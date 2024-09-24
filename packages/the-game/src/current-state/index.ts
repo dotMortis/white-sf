@@ -8,4 +8,5 @@ export type TheGameCurrentState = {
     bankStatus: BankStatus;
     humanStatus: HumanStatus;
     data: TheGameUpdateState['data'];
+    id: string;
 };

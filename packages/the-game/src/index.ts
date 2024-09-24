@@ -2,6 +2,7 @@ import { BaseLogger } from '@bits_devel/logger';
 import { randomInt } from 'crypto';
 import EventEmitter from 'events';
 import { nextTick } from 'process';
+import { v4 } from 'uuid';
 import { Action } from './action.js';
 import { CardDeck } from './card-deck.js';
 import { TheGameCurrentState } from './current-state/index.js';
@@ -32,9 +33,9 @@ export class TheGame {
     private readonly _looser: Player<Extract<PlayerName, 'LOOSER'>>;
     private readonly _bank: Player<Extract<PlayerName, 'BANK'>>;
     private readonly _options: Readonly<TheGmaeOptions>;
+    private readonly _stateStack: Array<TheGameCurrentState>;
     private _running: boolean;
     private _activePlayers: number;
-    private _currentStatus: TheGameCurrentState;
     private _theGameUpdateState: TheGameUpdateState | null;
 
     constructor(cardDeck: CardDeck, logger: BaseLogger, options?: Partial<TheGmaeOptions>) {
@@ -58,12 +59,15 @@ export class TheGame {
         this._eventEmitter = new EventEmitter();
         this._voteMaschine = new VoteMaschine(this._options.votingTimeMS, logger);
         this._voteMaschine.onUpdate(data => this._onUpdateVote(data));
-        this._currentStatus = {
-            bankStatus: 'DRAW',
-            humanStatus: 'DRAW',
-            gameStatus: 'WAITING_FOR_PLAYERS',
-            data: this.data
-        };
+        this._stateStack = [
+            {
+                bankStatus: 'DRAW',
+                humanStatus: 'DRAW',
+                gameStatus: 'ENDING',
+                id: v4(),
+                data: this.data
+            }
+        ];
     }
 
     get running(): boolean {
@@ -71,7 +75,8 @@ export class TheGame {
     }
 
     get currentStaus(): TheGameCurrentState {
-        return this._currentStatus;
+        this._reduceStateStack();
+        return this._stateStack.at(-1)!;
     }
 
     get data(): TheGameData {
@@ -95,6 +100,15 @@ export class TheGame {
 
     get theGameUpdateState(): TheGameUpdateState | null {
         return this._theGameUpdateState;
+    }
+
+    currentStatesFrom(id: string): Array<TheGameCurrentState> {
+        const index = this._stateStack.findIndex(state => state.id === id);
+        if (index > -1) {
+            return this._stateStack.slice(index + 1);
+        } else {
+            return [this.currentStaus];
+        }
     }
 
     playerUp(): number {
@@ -125,6 +139,26 @@ export class TheGame {
         }
     }
 
+    stop(): Promise<void> {
+        this._running = false;
+        return new Promise<void>(res => {
+            nextTick(() => {
+                this.playerReset();
+                this._cardDeck.reset();
+                this._looser.resetHand();
+                this._bank.resetHand();
+                this._looser.addCard(this._cardDeck.draw());
+                this._bank.addCard(this._cardDeck.draw());
+                this._emitUpdate({
+                    action: 'RESULT',
+                    data: this.data,
+                    ts: new Date().toISOString()
+                });
+                res();
+            });
+        });
+    }
+
     start(): void {
         this._logger.debug({ alreadyRunning: this._running }, 'TheGame: Start new game');
         if (this._running) return;
@@ -135,7 +169,11 @@ export class TheGame {
         this._looser.addCard(this._cardDeck.draw());
         this._bank.addCard(this._cardDeck.draw());
         this._voteStack.length = 0;
+        const requestedAt = Date.now();
         const interval = setInterval(() => {
+            if (!this._running) {
+                return clearInterval(interval);
+            }
             this._emitUpdate({
                 action: 'WAITING',
                 data: {
@@ -144,7 +182,7 @@ export class TheGame {
                 },
                 ts: new Date().toISOString()
             });
-            const started = this._start();
+            const started = this._start(requestedAt);
             this._logger.debug({ started }, 'TheGame: Try starting game');
             if (started) {
                 clearInterval(interval);
@@ -152,14 +190,22 @@ export class TheGame {
         }, 1000);
     }
 
-    private _start(): boolean {
-        if (this._activePlayers < this._options.minPlayers) {
+    private _start(requestedAt: number): boolean {
+        if (this._activePlayers < this._options.minPlayers && requestedAt + 60_000 > Date.now()) {
             return false;
         }
         nextTick(() => {
-            this._tick('DRAW', this._looser);
+            if (this._running) {
+                this._tick('DRAW', this._looser);
+            }
         });
         return true;
+    }
+
+    private _reduceStateStack(): void {
+        if (this._stateStack.length > 50) {
+            this._stateStack.splice(0, 10);
+        }
     }
 
     onUpdate(listener: (data: TheGameUpdateState) => void): void {
@@ -186,50 +232,58 @@ export class TheGame {
     private _setCurrentStatus(data: TheGameUpdateState): void {
         this._logger.debug({ data }, 'TheGame: Set current status');
         if (data.action === 'WAITING') {
-            this._currentStatus = {
+            this._stateStack.push({
+                id: v4(),
                 data: data.data,
                 humanStatus: 'DRAW',
                 bankStatus: 'DRAW',
                 gameStatus: 'WAITING_FOR_PLAYERS'
-            };
+            });
         } else if (data.action === 'RESULT') {
-            this._currentStatus = {
+            this._stateStack.push({
+                id: v4(),
                 data: data.data,
                 gameStatus: 'ENDING',
                 ...this._getWinnerInfo(data.data)
-            };
+            });
         } else if (data.action === 'COIN') {
-            this._currentStatus = {
+            this._stateStack.push({
+                id: v4(),
                 data: data.data,
                 gameStatus: 'RUNNING',
                 bankStatus: 'DRAW',
                 humanStatus: 'COIN'
-            };
+            });
         } else if (data.action === 'DRAW') {
-            this._currentStatus = {
+            this._stateStack.push({
+                id: v4(),
                 data: data.data,
                 bankStatus: 'DRAW',
                 humanStatus: data.player === 'LOOSER' ? 'DRAW' : 'PASS',
                 gameStatus: 'RUNNING'
-            };
+            });
         } else if (data.action === 'PASS') {
-            this._currentStatus = {
+            this._stateStack.push({
+                id: v4(),
                 data: data.data,
                 bankStatus: data.player === 'BANK' ? 'PASS' : 'DRAW',
                 humanStatus: 'PASS',
                 gameStatus: 'RUNNING'
-            };
+            });
         } else if (data.action === 'VOTING') {
-            this._currentStatus = {
+            this._stateStack.push({
+                id: v4(),
                 data: data.data,
                 bankStatus: 'DRAW',
                 humanStatus: 'VOTING',
                 gameStatus: 'RUNNING'
-            };
+            });
         }
     }
 
-    private _getWinnerInfo(data: TheGameData): Omit<TheGameCurrentState, 'data' | 'gameStatus'> {
+    private _getWinnerInfo(
+        data: TheGameData
+    ): Omit<TheGameCurrentState, 'data' | 'gameStatus' | 'id'> {
         const bankPoints = data.bank.points;
         const humanPoints = data.human.points;
         const bankLost = bankPoints > MAX_POINTS;
@@ -301,6 +355,9 @@ export class TheGame {
         player: Player<PlayerName>
     ) {
         this._logger.debug({ from, playerName: player.name }, 'TheGame: Tick');
+        if (!this._running) {
+            return;
+        }
         const tickInterval = this._options.tickIntervalMS;
         if (from === 'DRAW') {
             this._emitUpdate({
@@ -362,6 +419,9 @@ export class TheGame {
 
     private _runNextStep(from: Extract<Action, 'DRAW' | 'PASS'>, player: Player<PlayerName>): void {
         this._logger.debug({ from, playerName: player.name }, 'TheGame: Run next step');
+        if (!this._running) {
+            return;
+        }
         if (from === 'PASS' && player.name === 'LOOSER') {
             this._finalizeBank();
         } else if (from === 'PASS' && player.name === 'BANK') {

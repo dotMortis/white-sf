@@ -45,6 +45,19 @@ export class TelephoneController {
         };
     }
 
+    stopHandler(): ApiRequestHandler<
+        ApiParams,
+        { status: boolean },
+        ApiRequestBody,
+        InputFromStarfacePbx
+    > {
+        return async (req, res, next) => {
+            LOGGER.debug({ query: req.query, route: req.route }, 'Stop');
+            await this._theGame.stop();
+            res.status(200).json({ status: true });
+        };
+    }
+
     startGameHandler(): ApiRequestHandler<
         ApiParams,
         { status: boolean },
@@ -106,6 +119,22 @@ export class TelephoneController {
         return (req, res, next) => {
             LOGGER.debug({ query: req.query, route: req.route }, 'Game state');
             const state = this._theGame.currentStaus;
+            res.status(200).json(state);
+        };
+    }
+
+    stateFromHandler(): ApiRequestHandler<
+        ApiParams,
+        Array<TheGameCurrentState>,
+        ApiRequestBody,
+        InputFromStarfacePbx & { state_id: string }
+    > {
+        return (req, res, next) => {
+            LOGGER.debug({ query: req.query, route: req.route }, 'Game state');
+            if (!req.query.state_id) {
+                return next(new Error('Query parameter state_id is missing'));
+            }
+            const state = this._theGame.currentStatesFrom(req.query.state_id);
             res.status(200).json(state);
         };
     }
