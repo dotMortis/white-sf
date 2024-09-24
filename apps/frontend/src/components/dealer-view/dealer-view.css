@@ -15,15 +15,15 @@
     align-items: center;
     gap: 4em;
 
-    height: 100%;
+    height: 110%;
 
     flex-grow: 1;
 }
 
 .dealer-view > .drawn-cards > .playing-card {
-    height: 100%;
+    height: 110%;
 }
 
 .dealer-view > .card-deck {
-    height: 100%;
+    height: 120%;
 }

@@ -9,9 +9,9 @@ services:
         environment:
             LOG_LEVEL: 'debug'
             LOG_PATH: '/home/node/app/backend/logs'
-            GAME_MIN_PLAYERS: '4'
-            GAME_TICK_INTERVAL_MS: '2500'
-            GAME_VOTING_TIME_MS: '10000'
+            GAME_MIN_PLAYERS: '3'
+            GAME_TICK_INTERVAL_MS: '3000'
+            GAME_VOTING_TIME_MS: '15000'
             SERVER_PORT: '3000'
             SERVER_BASE_PATH: 'localhost'
             FRONTEND_URL: 'http://frontend:80'

@@ -14,9 +14,9 @@
     align-items: center;
     gap: 4em;
 
-    height: 100%;
+    height: 110%;
 }
 
 .player-view > .drawn-cards > .playing-card {
-    height: 100%;
+    height: 110%;
 }
