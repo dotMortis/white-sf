@@ -82,17 +82,17 @@ export class TheGame {
     get data(): TheGameData {
         return {
             bank: {
-                cards: this._bank.encodedCards,
+                cards: this._bank.encodedCards.slice(),
                 points: this._bank.points
             },
             human: {
                 activeCount: this._activePlayers,
-                cards: this._looser.encodedCards,
+                cards: this._looser.encodedCards.slice(),
                 points: this._looser.points
             },
             votings: {
                 current: this._voteMaschine.state.vote,
-                past: this._voteStack
+                past: this._voteStack.slice()
             },
             ts: new Date().toISOString()
         };
@@ -330,7 +330,7 @@ export class TheGame {
                 data: {
                     votings: {
                         current: vote.vote,
-                        past: this._voteStack,
+                        past: this._voteStack.slice(),
                         until: vote.until?.toISOString() ?? null
                     }
                 },

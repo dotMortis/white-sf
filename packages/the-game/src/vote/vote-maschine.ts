@@ -28,7 +28,7 @@ export class VoteMaschine {
     get state(): VoteState {
         return {
             status: this._voteRunning === null ? 'DONE' : 'RUNNING',
-            vote: this._currentVote,
+            vote: { ...this._currentVote },
             until:
                 this._runningSince === null
                     ? null
